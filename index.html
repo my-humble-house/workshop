@@ -105,15 +105,15 @@
   /* ===== 完成後的共同統計 ===== */
   .stats{margin-top:32px;border-top:1px solid var(--line);padding-top:20px}
   .stats h2{margin-bottom:4px}
-  .stats .hint{margin-bottom:16px}
-  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:14px}
+  .stats .hint{font-size:16px;margin-bottom:16px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:16px}
   .bar-label{flex:0 0 11em}
   .bar-track{flex:1;height:18px;background:var(--row);border-radius:99px;overflow:hidden}
   .bar-fill{display:block;height:100%;background:var(--accent);border-radius:99px}
   .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
   .task-list{list-style:none;margin-top:8px}
-  .task-list li{font-size:15px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
-  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
+  .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
+  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:16px;border-radius:99px;padding:2px 10px}
   @media (max-width:480px){.bar-label{flex-basis:8em}}
   @media (max-width:480px){.card{padding:28px 22px 24px;border-radius:24px 24px 52px 24px}h1{font-size:21px}h2{font-size:18px}}
 </style>
@@ -211,23 +211,20 @@ const QUESTIONS = [
      "產出完整檔案：簡報、Word、Excel、互動圖表",
      "跨部門協作時怎麼共用設定與成果"
    ]},
-  {id:"q12", section:"第三部分・需求與期待", type:"multitext",
-   title:"Q12. 課堂實作題：描述一個你想在課堂上完成的真實任務",
+  {id:"q12", section:"第三部分・需求與期待", type:"single",
+   title:"Q12. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
+   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
+  {id:"q13", section:"第三部分・需求與期待", type:"text",
+   title:"Q13. 這次工作坊你最希望解決的一個問題是什麼？",
+   placeholder:"自由填寫"},
+  {id:"q14", section:"第三部分・需求與期待", type:"multitext",
+   title:"Q14. 課堂實作題：描述一個你想在課堂上完成的真實任務",
    hint:"工作坊會直接用你的任務帶你做完,寫得越具體,課堂收穫越大。",
    fields:[
      {key:"task", label:"這個任務是什麼", ph:"例:每週一要發四間館的 IG 文案,共 8 則", required:true},
      {key:"now",  label:"現在怎麼做、多久做一次", ph:"例:每次自己想文案,大約花兩小時"},
      {key:"goal", label:"希望 Claude 幫到什麼程度", ph:"例:我給主題就產出八成可用的初稿"}
-   ]},
-  {id:"q13", section:"第三部分・需求與期待", type:"single",
-   title:"Q13. 你知道 Artifacts 功能嗎？",
-   options:["知道而且用過","聽過但不確定怎麼用","第一次聽到"], other:true},
-  {id:"q14", section:"第三部分・需求與期待", type:"single",
-   title:"Q14. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
-   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
-  {id:"q15", section:"第三部分・需求與期待", type:"text",
-   title:"Q15. 這次工作坊你最希望解決的一個問題是什麼？",
-   placeholder:"自由填寫"}
+   ]}
 ];
 
 /* Q11 選項文字對應教材類別代號 */
@@ -290,7 +287,7 @@ function renderGate(){
     <p class="hint">本問卷僅供工作坊學員填寫。通行碼寫在課程公告裡，輸入後即可開始作答。</p>
     <div class="field">
       <label for="gCode">課程通行碼</label>
-      <input type="text" id="gCode" value="${esc(classCode)}" placeholder="請輸入 邀請碼" autocomplete="off">
+      <input type="text" id="gCode" value="${esc(classCode)}" placeholder="輸入邀請碼" autocomplete="off">
     </div>
     <p class="error" id="err"></p>
     <div class="nav">
@@ -493,15 +490,15 @@ function buildCategoryTags(){
   if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
   if(a.q10.includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
   if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定") diag.add("C").add("D");
-  if(a.q12.task) diag.add("D");                                  // 有固定實作任務,需要 Project
+  if(a.q14.task) diag.add("D");                                  // 有固定實作任務,需要 Project
   if(a.q7 === "整份檔案直接上傳") diag.add("E");
   if(a.q8.includes("掃描檔或紙本拍照") || a.q8.includes("手機截圖")) diag.add("E");
   if(a.q10.includes("數字加總或計算結果出錯") || a.q10.includes("讀取掃描檔或圖片時認錯字")) diag.add("E");
   if(a.q3.includes("處理報表數字") || a.q4.includes("報表或 Excel")) diag.add("E");
   if(a.q3.includes("寫或改文案") || a.q4.includes("社群文案")) diag.add("F");
-  if(a.q13 === "第一次聽到" || a.q4.includes("簡報") || a.q4.includes("互動式工具或圖表")) diag.add("G");
-  if(a.q14 === "聽過但不確定差別在哪" || a.q14 === "第一次聽到這兩個詞") diag.add("H");
-  if(a.q14 === "第一次聽到這兩個詞") diag.add("G");
+  if(a.q4.includes("簡報") || a.q4.includes("互動式工具或圖表")) diag.add("G");
+  if(a.q12 === "聽過但不確定差別在哪" || a.q12 === "第一次聽到這兩個詞") diag.add("H");
+  if(a.q12 === "第一次聽到這兩個詞") diag.add("G");
   const chosen = a.q11.map(o => TOPIC_MAP[o]).filter(Boolean);
   const fmt = arr => arr.length ? arr.map(c => c + " " + CATEGORY_NAMES[c]).join("、") : "（無）";
   const diagArr = [...diag].sort();
@@ -526,7 +523,7 @@ function buildPayload(){
     dept: answers.dept,
     topics: tags.chosenRaw,
     diag: tags.diagRaw,
-    task: (answers.q12.task || "").slice(0, 120),
+    task: (answers.q14.task || "").slice(0, 120),
     ts: Date.now()
   };
 }
