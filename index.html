@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 工作坊 課前調查</title>
+<style>
+  /* ===== 基礎設定：全部使用裝置內建字型 ===== */
+  :root{
+    --ink:#1C2B27;          /* 主要文字 */
+    --green:#17463B;        /* 主色：深綠 */
+    --green-soft:#E3EDE9;   /* 主色淡底 */
+    --amber:#B97A1E;        /* 強調色：琥珀（裝飾用途） */
+    --amber-text:#8F5E15;   /* 強調文字色：琥珀深化版，符合對比度 */
+    --line:#D5DCD8;         /* 邊框 */
+    --bg:#EEF1EF;           /* 頁面底色 */
+    --card:#FFFFFF;
+    --muted:#5E6E68;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    display:flex;justify-content:center;align-items:flex-start;
+    padding:32px 16px;
+    line-height:1.7;
+  }
+  .card{
+    width:100%;max-width:620px;
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    padding:36px 32px 28px;
+  }
+  /* ===== 進度條 ===== */
+  .progress-wrap{margin-bottom:28px}
+  .progress-label{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.14em;margin-bottom:8px;display:flex;justify-content:space-between}
+  .progress-bar{height:4px;background:var(--green-soft);border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--green);width:0%;transition:width .3s ease}
+  @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
+  /* ===== 題目區 ===== */
+  .eyebrow{font-size:13px;color:var(--amber-text);letter-spacing:.14em;font-weight:600;margin-bottom:10px}
+  h1{font-size:24px;font-weight:700;line-height:1.45;margin-bottom:6px}
+  h2{font-size:20px;font-weight:700;line-height:1.5;margin-bottom:6px}
+  .hint{font-size:14px;color:var(--muted);margin-bottom:22px}
+  /* ===== 選項按鈕 ===== */
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+  .opt{
+    width:100%;text-align:left;
+    font-size:16px;font-family:inherit;color:var(--ink);
+    background:#FAFBFA;border:1.5px solid var(--line);border-radius:10px;
+    padding:13px 16px;cursor:pointer;
+  }
+  .opt:hover{border-color:var(--green)}
+  .opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .opt.selected{border-color:var(--green);background:var(--green-soft);font-weight:600}
+  /* ===== 輸入欄位 ===== */
+  .field{margin-bottom:18px}
+  .field-row{display:flex;gap:12px}
+  .field-row .field{flex:1}
+  @media (max-width:480px){.field-row{flex-direction:column;gap:0}}
+  .field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+  input[type=text],textarea{
+    width:100%;font-size:16px;font-family:inherit;color:var(--ink);
+    border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;background:#FAFBFA;
+  }
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--green)}
+  textarea{min-height:96px;resize:vertical}
+  /* ===== 導覽按鈕 ===== */
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .btn{
+    font-size:15px;font-family:inherit;font-weight:600;
+    border-radius:10px;padding:11px 22px;cursor:pointer;border:1.5px solid transparent;
+  }
+  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-primary:hover{background:#0F362D}
+  .btn-ghost{background:none;border-color:var(--line);color:var(--muted)}
+  .btn-ghost:hover{border-color:var(--green);color:var(--green)}
+  .error{color:#A03020;font-size:14px;margin:-12px 0 16px;display:none}
+  /* ===== 結果頁 ===== */
+  .summary{
+    border:1.5px solid var(--line);border-radius:10px;background:#FAFBFA;
+    padding:16px;font-size:16px;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:18px;
+  }
+  .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .copied{color:var(--green);font-size:14px;font-weight:600;display:none}
+  .footer-note{font-size:13px;color:var(--muted);margin-top:24px}
+  .other-wrap{display:none;margin-top:-2px}
+  .other-wrap.show{display:block}
+  /* ===== 完成後的共同統計 ===== */
+  .stats{margin-top:32px}
+  .stats h2{margin-bottom:4px}
+  .stats .hint{margin-bottom:16px}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:16px}
+  .bar-label{flex:0 0 11em}
+  .bar-track{flex:1;height:20px;background:var(--green-soft);border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--green)}
+  .bar-num{flex:0 0 2em;text-align:right;font-weight:600;color:var(--green)}
+  .task-list{list-style:none;margin-top:8px}
+  .task-list li{font-size:16px;padding:10px 0}
+  .task-list .dept-tag{color:var(--amber-text);font-weight:600;font-size:13px;letter-spacing:.14em;margin-right:8px}
+  @media (max-width:480px){.bar-label{flex-basis:8em}}
+  @media (max-width:480px){.card{padding:28px 20px 22px}h1{font-size:21px}h2{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div id="screen"></div>
+</div>
+
+<script>
+/* ====== 教材類別定義(與內訓教材規劃一致) ====== */
+const CATEGORY_NAMES = {
+  A:"帳號與初始設定", B:"三種模式選擇", C:"Token 與使用效率", D:"Project 建立與管理",
+  E:"報表與數字處理", F:"社群文案與自動化", G:"檔案產出與 Artifacts", H:"跨部門協作"
+};
+
+/* ====== 題目資料 ====== */
+const QUESTIONS = [
+  {id:"q1", section:"第一部分・使用現況", type:"single",
+   title:"Q1. 你目前使用 Claude 的頻率？",
+   options:["每天多次","每天一次","每週幾次","很少用","還沒用過"], other:true},
+  {id:"q2", section:"第一部分・使用現況", type:"multi",
+   title:"Q2. 你用過哪些模式？", hint:"可複選",
+   options:["Chat 網頁版","手機 App","Cowork","Code","不確定自己用的是哪種"], other:true},
+  {id:"q3", section:"第一部分・使用現況", type:"multi",
+   title:"Q3. 你最常請 Claude 做什麼？", hint:"可複選",
+   options:["寫或改文案","整理會議記錄","處理報表數字","翻譯","草擬郵件或提案","整理資料或文件","問問題、查資料"], other:true},
+  {id:"q4", section:"第一部分・使用現況", type:"multi",
+   title:"Q4. 你的工作固定要產出哪些東西？", hint:"可複選,不限是否用 Claude 做",
+   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表"], other:true},
+  {id:"q5", section:"第二部分・使用習慣", type:"single",
+   title:"Q5. 你通常怎麼開對話？",
+   options:["一個對話從頭用到尾，什麼事都在裡面問","不同任務會開新對話","看心情，沒特別注意"], other:true},
+  {id:"q6", section:"第二部分・使用習慣", type:"single",
+   title:"Q6. 有固定背景（品牌調性、部門資訊）需要 Claude 知道時，你會怎麼做？",
+   options:["每次對話開頭重新貼一次","已經設定在 Project Instructions","不知道可以預先設定","我的工作沒有這種需求"], other:true},
+  {id:"q7", section:"第二部分・使用習慣", type:"single",
+   title:"Q7. 需要 Claude 處理檔案裡的某個數字或段落時，你會？",
+   options:["整份檔案直接上傳","只貼需要的那一段或那幾列","先截圖再上傳","沒遇過這種情況"], other:true},
+  {id:"q8", section:"第二部分・使用習慣", type:"multi",
+   title:"Q8. 你給 Claude 的檔案通常是什麼格式？", hint:"可複選",
+   options:["Excel 或 CSV","電子版 PDF","掃描檔或紙本拍照","手機截圖","不會上傳檔案"], other:true},
+  {id:"q9", section:"第二部分・使用習慣", type:"single",
+   title:"Q9. Claude 產出不符合預期時，你通常？",
+   options:["來回叫它改好幾次直到滿意","重新下一次更完整的指令","放棄，自己改","直接拿去用，沒特別發現問題"], other:true},
+  {id:"q10", section:"第二部分・使用習慣", type:"multi",
+   title:"Q10. 你是否遇過以下狀況？", hint:"可複選",
+   options:["數字加總或計算結果出錯","用到一半被告知額度用完、要等冷卻","產出的格式每次都不一樣","讀取掃描檔或圖片時認錯字","都沒遇過"], other:true},
+  {id:"q11", section:"第三部分・需求與期待", type:"multi", max:3,
+   title:"Q11. 以下主題，選出你最想加強的", hint:"最多選三個",
+   options:[
+     "帳號與基本設定還不熟，想從頭學",
+     "搞懂 Chat、Cowork、Code 什麼時候用哪個",
+     "用得省：不要動不動就額度用完",
+     "固定任務設定一次就好，不用每次重新解釋",
+     "報表與數字處理：給對檔案、數字不出錯",
+     "社群文案半自動化：一次產出整週的量",
+     "產出完整檔案：簡報、Word、Excel、互動圖表",
+     "跨部門協作時怎麼共用設定與成果"
+   ]},
+  {id:"q12", section:"第三部分・需求與期待", type:"multitext",
+   title:"Q12. 課堂實作題：描述一個你想在課堂上完成的真實任務",
+   hint:"工作坊會直接用你的任務帶你做完,寫得越具體,課堂收穫越大。",
+   fields:[
+     {key:"task", label:"這個任務是什麼", ph:"例:每週一要發四間館的 IG 文案,共 8 則", required:true},
+     {key:"now",  label:"現在怎麼做、多久做一次", ph:"例:每次自己想文案,大約花兩小時"},
+     {key:"goal", label:"希望 Claude 幫到什麼程度", ph:"例:我給主題就產出八成可用的初稿"}
+   ]},
+  {id:"q13", section:"第三部分・需求與期待", type:"single",
+   title:"Q13. 你知道 Artifacts 功能嗎？",
+   options:["知道而且用過","聽過但不確定怎麼用","第一次聽到"], other:true},
+  {id:"q14", section:"第三部分・需求與期待", type:"single",
+   title:"Q14. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
+   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
+  {id:"q15", section:"第三部分・需求與期待", type:"text",
+   title:"Q15. 這次工作坊你最希望解決的一個問題是什麼？",
+   placeholder:"自由填寫"}
+];
+
+/* Q11 選項文字對應教材類別代號 */
+const TOPIC_MAP = {
+  "帳號與基本設定還不熟，想從頭學":"A",
+  "搞懂 Chat、Cowork、Code 什麼時候用哪個":"B",
+  "用得省：不要動不動就額度用完":"C",
+  "固定任務設定一次就好，不用每次重新解釋":"D",
+  "報表與數字處理：給對檔案、數字不出錯":"E",
+  "社群文案半自動化：一次產出整週的量":"F",
+  "產出完整檔案：簡報、Word、Excel、互動圖表":"G",
+  "跨部門協作時怎麼共用設定與成果":"H"
+};
+
+/* ====== 狀態 ====== */
+let step = 0;                       // 0=基本資料, 1..N=題目, N+1=結果頁
+const TOTAL = QUESTIONS.length;
+const answers = { name:"", dept:"", job:"" };
+QUESTIONS.forEach(q => {
+  if(q.type === "multi") answers[q.id] = [];
+  else if(q.type === "multitext"){ answers[q.id] = {}; q.fields.forEach(f => answers[q.id][f.key] = ""); }
+  else answers[q.id] = "";
+});
+const otherTexts = {};              // 各題「其他」選項的自填內容
+
+const $screen = document.getElementById("screen");
+
+/* ====== 畫面渲染 ====== */
+function render(){
+  updateProgress();
+  if(step === 0) renderIntro();
+  else if(step >= 1 && step <= TOTAL) renderQuestion(QUESTIONS[step-1]);
+  else renderDone();
+  window.scrollTo({top:0});
+}
+
+function updateProgress(){
+  const fill = document.getElementById("progressFill");
+  const count = document.getElementById("progressCount");
+  const sec = document.getElementById("progressSection");
+  if(step === 0){ fill.style.width = "0%"; count.textContent = ""; sec.textContent = "基本資料"; }
+  else if(step <= TOTAL){
+    fill.style.width = Math.round(step/ (TOTAL+1) *100) + "%";
+    count.textContent = "第 " + step + " 題，共 " + TOTAL + " 題";
+    sec.textContent = QUESTIONS[step-1].section;
+  } else { fill.style.width = "100%"; count.textContent = ""; sec.textContent = "完成"; }
+}
+
+/* --- 基本資料頁 --- */
+function renderIntro(){
+  $screen.innerHTML = `
+    <div class="eyebrow">CLAUDE 工作坊・課前調查</div>
+    <h1>開始之前，先認識你一下</h1>
+    <p class="hint">共 ${TOTAL} 題，約 5 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
+    <div class="field-row">
+      <div class="field">
+        <label for="fName">姓名</label>
+        <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="fDept">所屬部門</label>
+        <input type="text" id="fDept" value="${esc(answers.dept)}" placeholder="例：行銷部">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fJob">主要工作內容（一句話即可）</label>
+      <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
+    </div>
+    <p class="error" id="err">請填寫姓名與所屬部門。</p>
+    <div class="nav">
+      <span></span>
+      <button class="btn btn-primary" id="nextBtn">開始作答</button>
+    </div>`;
+  document.getElementById("nextBtn").addEventListener("click", ()=>{
+    answers.name = document.getElementById("fName").value.trim();
+    answers.dept = document.getElementById("fDept").value.trim();
+    answers.job  = document.getElementById("fJob").value.trim();
+    if(!answers.name || !answers.dept){
+      document.getElementById("err").style.display = "block"; return;
+    }
+    step = 1; render();
+  });
+}
+
+/* --- 題目頁 --- */
+const OTHER = "其他";
+
+/* 判斷該題目前是否選了「其他」 */
+function isOtherSelected(q){
+  return q.type === "multi" ? answers[q.id].includes(OTHER) : answers[q.id] === OTHER;
+}
+
+function renderQuestion(q){
+  let body = "";
+  if(q.type === "text"){
+    body = `<textarea id="fText" placeholder="${esc(q.placeholder||"")}">${esc(answers[q.id])}</textarea>`;
+  } else if(q.type === "multitext"){
+    body = q.fields.map(f => `
+      <div class="field">
+        <label for="mt_${f.key}">${f.label}</label>
+        <textarea id="mt_${f.key}" placeholder="${esc(f.ph||"")}" style="min-height:64px">${esc(answers[q.id][f.key])}</textarea>
+      </div>`).join("");
+  } else {
+    const opts = q.other ? q.options.concat(OTHER) : q.options;
+    body = `<div class="options" id="opts">
+      ${opts.map(o=>{
+        const sel = q.type==="multi" ? answers[q.id].includes(o) : answers[q.id]===o;
+        return `<button type="button" class="opt ${sel?"selected":""}" data-val="${esc(o)}">${o}</button>`;
+      }).join("")}
+      ${q.other?`<div class="other-wrap ${isOtherSelected(q)?"show":""}" id="otherWrap">
+        <label for="otherInput">請說明</label>
+        <input type="text" id="otherInput" value="${esc(otherTexts[q.id]||"")}" placeholder="自由填寫">
+      </div>`:""}
+    </div>`;
+  }
+  $screen.innerHTML = `
+    <div class="eyebrow">${q.section}</div>
+    <h2>${q.title}</h2>
+    ${q.hint?`<p class="hint">${q.hint}</p>`:`<div style="height:14px"></div>`}
+    ${body}
+    <p class="error" id="err">請至少選擇一個選項。</p>
+    <div class="nav">
+      <button class="btn btn-ghost" id="backBtn">上一步</button>
+      <button class="btn btn-primary" id="nextBtn">${step===TOTAL?"完成":"下一題"}</button>
+    </div>`;
+
+  const $otherWrap  = document.getElementById("otherWrap");
+  const $otherInput = document.getElementById("otherInput");
+  const $err = document.getElementById("err");
+
+  /* 儲存「其他」說明文字 */
+  function saveOther(){
+    if($otherInput) otherTexts[q.id] = $otherInput.value.trim();
+  }
+  /* 儲存多欄位填寫題 */
+  function saveMultitext(){
+    if(q.type !== "multitext") return;
+    q.fields.forEach(f => answers[q.id][f.key] = document.getElementById("mt_"+f.key).value.trim());
+  }
+  function showErr(msg){ $err.textContent = msg; $err.style.display = "block"; }
+
+  if(q.type === "single"){
+    document.querySelectorAll("#opts .opt").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        answers[q.id] = b.dataset.val;
+        document.querySelectorAll("#opts .opt").forEach(x=>x.classList.remove("selected"));
+        b.classList.add("selected");
+        if(b.dataset.val === OTHER && $otherWrap){
+          /* 選「其他」時不自動前進,展開輸入欄等待填寫 */
+          $otherWrap.classList.add("show");
+          $otherInput.focus();
+        } else {
+          if($otherWrap) $otherWrap.classList.remove("show");
+          setTimeout(()=>{ step++; render(); }, 220);   // 單選後自動前進
+        }
+      });
+    });
+  } else if(q.type === "multi"){
+    document.querySelectorAll("#opts .opt").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        const v = b.dataset.val;
+        const arr = answers[q.id];
+        const i = arr.indexOf(v);
+        if(i >= 0){ arr.splice(i,1); }
+        else {
+          /* 有選擇上限的題目(如最多三個)到達上限時擋下並提示 */
+          if(q.max && arr.length >= q.max){ showErr("這題最多選 " + q.max + " 個，請先取消一個再選。"); return; }
+          arr.push(v);
+        }
+        $err.style.display = "none";
+        b.classList.toggle("selected");
+        if(v === OTHER && $otherWrap){
+          $otherWrap.classList.toggle("show", arr.includes(OTHER));
+          if(arr.includes(OTHER)) $otherInput.focus();
+        }
+      });
+    });
+  }
+  document.getElementById("backBtn").addEventListener("click", ()=>{
+    if(q.type === "text") answers[q.id] = document.getElementById("fText").value.trim();
+    saveMultitext(); saveOther();
+    step--; render();
+  });
+  document.getElementById("nextBtn").addEventListener("click", ()=>{
+    if(q.type === "text"){
+      answers[q.id] = document.getElementById("fText").value.trim();
+    } else if(q.type === "multitext"){
+      saveMultitext();
+      const req = q.fields.find(f => f.required && !answers[q.id][f.key]);
+      if(req){ showErr("「" + req.label + "」是必填，請至少寫一句。"); return; }
+    } else if(q.type === "single" && !answers[q.id]){
+      showErr("請至少選擇一個選項。"); return;
+    } else if(q.type === "multi" && answers[q.id].length === 0){
+      showErr("請至少選擇一個選項。"); return;
+    }
+    saveOther();
+    /* 選了「其他」但沒填說明:提示補填 */
+    if(q.other && isOtherSelected(q) && !otherTexts[q.id]){
+      showErr("你選了「其他」，請在欄位中填寫說明。");
+      if($otherInput) $otherInput.focus();
+      return;
+    }
+    step++; render();
+  });
+}
+
+/* --- 教材分類自動標籤 --- */
+function buildCategoryTags(){
+  const diag = new Set();
+  const a = answers;
+  if(a.q1 === "還沒用過") diag.add("A");
+  if(a.q2.includes("不確定自己用的是哪種")) diag.add("B");
+  if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
+  if(a.q10.includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
+  if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定") diag.add("C").add("D");
+  if(a.q12.task) diag.add("D");                                  // 有固定實作任務,需要 Project
+  if(a.q7 === "整份檔案直接上傳") diag.add("E");
+  if(a.q8.includes("掃描檔或紙本拍照") || a.q8.includes("手機截圖")) diag.add("E");
+  if(a.q10.includes("數字加總或計算結果出錯") || a.q10.includes("讀取掃描檔或圖片時認錯字")) diag.add("E");
+  if(a.q3.includes("處理報表數字") || a.q4.includes("報表或 Excel")) diag.add("E");
+  if(a.q3.includes("寫或改文案") || a.q4.includes("社群文案")) diag.add("F");
+  if(a.q13 === "第一次聽到" || a.q4.includes("簡報") || a.q4.includes("互動式工具或圖表")) diag.add("G");
+  if(a.q14 === "聽過但不確定差別在哪" || a.q14 === "第一次聽到這兩個詞") diag.add("H");
+  if(a.q14 === "第一次聽到這兩個詞") diag.add("G");
+  const chosen = a.q11.map(o => TOPIC_MAP[o]).filter(Boolean);
+  const fmt = arr => arr.length ? arr.map(c => c + " " + CATEGORY_NAMES[c]).join("、") : "（無）";
+  const diagArr = [...diag].sort();
+  return { diag: fmt(diagArr), chosen: fmt(chosen), diagRaw: diagArr, chosenRaw: chosen };
+}
+
+/* --- 共同統計(由統計 API 提供;直接開離線 HTML 檔時自動略過) --- */
+const API_BASE = "https://workshop-survey-api.ciracloser.workers.dev";
+
+/* 以姓名+部門產生固定代號:同一人重填會覆蓋舊回覆,不會重複計算 */
+function uidFrom(name, dept){
+  let h = 0; const str = name + "|" + dept;
+  for(let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+  return h.toString(36);
+}
+
+/* 組出匿名化回覆:只含部門、主題、診斷標籤、實作任務摘要,不含姓名與完整作答 */
+function buildPayload(){
+  const tags = buildCategoryTags();
+  return {
+    uid: uidFrom(answers.name, answers.dept),
+    dept: answers.dept,
+    topics: tags.chosenRaw,
+    diag: tags.diagRaw,
+    task: (answers.q12.task || "").slice(0, 120),
+    ts: Date.now()
+  };
+}
+
+async function submitShared(payload){
+  const r = await fetch(API_BASE + "/api/response", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+  if(!r.ok) throw new Error("submit failed: " + r.status);
+}
+
+/* 讀取所有回覆並彙整;清單更新有短暫延遲,自己剛送出的回覆若還沒出現就先補進統計 */
+async function loadShared($box, mine){
+  try{
+    const r = await fetch(API_BASE + "/api/responses");
+    if(!r.ok) throw new Error("load failed: " + r.status);
+    let list = await r.json();
+    if(mine && !list.some(d => d.uid === mine.uid)) list = list.concat(mine);
+    if(list.length <= 1){
+      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你是第一位完成的，等其他同仁填寫後，這裡會出現大家最想學的主題統計。</p>';
+      return;
+    }
+    const topicCount = {}; const deptCount = {}; const tasks = [];
+    list.forEach(d => {
+      (d.topics || []).concat(d.diag || []).forEach(t => topicCount[t] = (topicCount[t]||0) + 1);
+      if(d.dept) deptCount[d.dept] = (deptCount[d.dept]||0) + 1;
+      if(d.task) tasks.push({dept: d.dept, task: d.task, ts: d.ts || 0});
+    });
+    renderStats($box, topicCount, deptCount, tasks, list.length);
+  }catch(e){
+    $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的回覆不受影響，仍可在上方複製或下載。</p>';
+  }
+}
+
+/* 繪製統計畫面:主題長條 + 各部門實作任務方向 */
+function renderStats($box, topicCount, deptCount, tasks, n){
+  const entries = Object.entries(topicCount).sort((a,b) => b[1] - a[1]);
+  const maxV = entries.length ? entries[0][1] : 1;
+  const bars = entries.map(([c, v]) =>
+    `<div class="bar-row">
+      <span class="bar-label">${c} ${CATEGORY_NAMES[c] || ""}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%"></span></span>
+      <span class="bar-num">${v}</span>
+    </div>`).join("");
+  const latest = tasks.sort((a,b) => b.ts - a.ts).slice(0, 8).map(t =>
+    `<li><span class="dept-tag">${esc(t.dept)}</span>${esc(t.task)}</li>`).join("");
+  const deptLine = Object.entries(deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
+  $box.innerHTML = `
+    <h2>大家提出的方向</h2>
+    <p class="hint">已有 ${n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名。</p>
+    <h3>最多人需要加強的主題</h3>
+    ${bars}
+    ${latest ? `<h3 style="margin-top:24px">其他同仁帶來的實作任務</h3>
+    <p class="hint">看看別人打算怎麼用，也許有你沒想過的用法。</p>
+    <ul class="task-list">${latest}</ul>` : ""}`;
+}
+
+/* --- 結果頁 --- */
+function buildResultText(){
+  const lines = [];
+  lines.push("【Claude 工作坊 課前調查回覆】");
+  lines.push("姓名：" + answers.name);
+  lines.push("部門：" + answers.dept);
+  lines.push("工作內容：" + (answers.job || "（未填）"));
+  lines.push("");
+  QUESTIONS.forEach(q=>{
+    const a = answers[q.id];
+    let text;
+    if(q.type === "multitext"){
+      text = q.fields.map(f => f.label + "：" + (a[f.key] || "（未填）")).join("／");
+    } else {
+      const fmt = o => o === OTHER ? "其他（" + (otherTexts[q.id] || "未說明") + "）" : o;
+      text = Array.isArray(a) ? (a.length ? a.map(fmt).join("、") : "（未填）") : (a ? fmt(a) : "（未填）");
+    }
+    lines.push(q.title);
+    lines.push("→ " + text);
+    lines.push("");
+  });
+  const tags = buildCategoryTags();
+  lines.push("【教材分類，供課程彙整用】");
+  lines.push("診斷建議：" + tags.diag);
+  lines.push("學員自選：" + tags.chosen);
+  return lines.join("\n");
+}
+
+function renderDone(){
+  const result = buildResultText();
+  $screen.innerHTML = `
+    <div class="eyebrow">完成</div>
+    <h1>填寫完成，最後一步</h1>
+    <p class="hint">請點「複製回覆內容」，然後貼到回傳給課程窗口的訊息或郵件中。</p>
+    <div class="summary" id="summary">${esc(result)}</div>
+    <div class="done-actions">
+      <button class="btn btn-primary" id="copyBtn">複製回覆內容</button>
+      <button class="btn btn-ghost" id="dlBtn">下載成文字檔</button>
+      <button class="btn btn-ghost" id="editBtn">回去修改</button>
+    </div>
+    <span class="copied" id="copiedMsg">已複製，請貼上回傳給課程窗口。</span>
+    <div class="stats" id="statsBox"></div>
+    <p class="footer-note" id="footNote">關閉視窗前請務必先複製或下載你的回覆。</p>`;
+
+  /* 網頁版:寫入共用統計後顯示大家的方向;離線 HTML 檔:說明統計僅線上網址可見 */
+  const $statsBox = document.getElementById("statsBox");
+  if(location.protocol !== "file:"){
+    $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">統計載入中。</p>';
+    const mine = buildPayload();
+    submitShared(mine)
+      .catch(()=>{ /* 提交失敗不阻擋完成頁,學員仍可複製或下載回覆 */ })
+      .then(() => loadShared($statsBox, mine));
+  } else {
+    $statsBox.innerHTML = "";
+    document.getElementById("footNote").textContent =
+      "你開啟的是離線 HTML 檔，回覆只存在你的畫面上，關閉視窗前請務必先複製或下載。若想看其他同仁的填答統計，請改用課程公告的線上問卷網址填寫。";
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", async ()=>{
+    try{ await navigator.clipboard.writeText(result); }
+    catch(e){
+      /* 舊版瀏覽器備援：用隱藏 textarea 複製 */
+      const t = document.createElement("textarea");
+      t.value = result; document.body.appendChild(t);
+      t.select(); document.execCommand("copy"); t.remove();
+    }
+    document.getElementById("copiedMsg").style.display = "inline";
+  });
+  document.getElementById("dlBtn").addEventListener("click", ()=>{
+    const blob = new Blob([result], {type:"text/plain;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "課前調查_" + (answers.name || "回覆") + ".txt";
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+  document.getElementById("editBtn").addEventListener("click", ()=>{ step = TOTAL; render(); });
+}
+
+/* ====== 工具 ====== */
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+render();
+</script>
+</body>
+</html>

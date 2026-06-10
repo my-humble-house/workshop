@@ -1,0 +1,7 @@
+{
+  "name": "workshop-survey-api",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "^4.99.0"
+  }
+}

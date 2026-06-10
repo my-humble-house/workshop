@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "workshop-survey-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RESPONSES",
+      "id": "14b5a75c79cd48f0bc8d8ca26e190b05"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+# Claude 工作坊 課前調查
+
+工作坊課前調查問卷：單檔互動式 HTML，部署於 GitHub Pages，並以 Cloudflare Worker + KV 提供匿名共同統計。
+
+## 線上網址
+
+- 問卷：https://linachang.github.io/claude-workshop-survey/
+- 統計 API：見 `index.html` 內 `API_BASE` 常數
+
+## 結構
+
+```
+index.html                 問卷本體（原生 HTML/CSS/JS 單檔）
+worker/                    統計後端（Cloudflare Worker + KV）
+  ├─ wrangler.toml
+  └─ src/index.js
+docs/specs/                設計文件
+CLAUDE.md                  開發規範（技術邊界、資料與隱私、部署）
+```
+
+## 運作方式
+
+- 學員作答後，完成頁產出完整回覆文字，由學員**複製或下載後自行回傳課程窗口**；完整回覆不會上傳。
+- 同時前端會將匿名彙整（部門、主題代號、診斷標籤、任務摘要）送至統計 API，完成頁顯示全體統計。
+- 直接下載 `index.html` 離線開啟（`file:`）時自動降級為純離線模式，不顯示統計。
+
+## 本地預覽
+
+```bash
+python3 -m http.server 8000
+# 開 http://localhost:8000
+```
+
+## 部署
+
+- **前台**：push 到 `main`，GitHub Pages 自動更新。
+- **後端**：
+  ```bash
+  cd worker
+  npx wrangler deploy
+  ```
+
+詳細規範見 [CLAUDE.md](CLAUDE.md)，設計脈絡見 [docs/specs/](docs/specs/)。
