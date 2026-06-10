@@ -4,15 +4,21 @@
 
 ## 線上網址
 
-- 問卷：https://linachang.github.io/claude-workshop-survey/
+- 問卷：https://my-humble-house.github.io/workshop/
 - 統計 API：見 `index.html` 內 `API_BASE` 常數
+
+## 存取防護
+
+- **課程通行碼**：提交回覆與讀取統計都需要 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`（`cd worker && npx wrangler secret put CLASS_CODE` 設定／更換），學員在問卷第一頁輸入，通行碼隨課程公告發布、不進 repo。
+- **節流**：每 IP 每分鐘最多 5 次提交；回覆總量上限 300 筆（同人重填覆蓋不受限）。
+- **noindex**：頁面標示 `noindex,nofollow`，降低被搜尋引擎收錄的機率。
 
 ## 結構
 
 ```
 index.html                 問卷本體（原生 HTML/CSS/JS 單檔）
 worker/                    統計後端（Cloudflare Worker + KV）
-  ├─ wrangler.toml
+  ├─ wrangler.jsonc
   └─ src/index.js
 docs/specs/                設計文件
 CLAUDE.md                  開發規範（技術邊界、資料與隱私、部署）

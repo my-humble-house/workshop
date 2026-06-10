@@ -37,8 +37,18 @@ Workers KV（key 格式 resp:<uid>）
   - `uid`：前端以姓名+部門雜湊產生（base36，≤13 字元），同一人重填覆蓋。
   - 驗證：`uid` 格式、`dept` 必填且截斷 50 字、`topics`/`diag` 僅允許 A–H 代號、`task` 截斷 120 字。不合法回 400。
 - `GET /api/responses`：回傳全部匿名回覆陣列，由前端彙整繪製統計。
-- CORS：允許 `https://linachang.github.io` 與本機預覽；處理 OPTIONS preflight。
+- CORS：允許 `https://my-humble-house.github.io`、`https://linachang.github.io`（舊址）與本機預覽；處理 OPTIONS preflight。
 - 不儲存姓名或完整作答（隱私邊界見 CLAUDE.md）。
+
+### 存取防護（2026-06-10 補充）
+
+威脅模型：頁面網址公開可被發現（公開 repo＋搜尋引擎），Worker 網址寫在前端原始碼，CORS 擋不了 curl 等腳本。對策：
+
+- **課程通行碼**：`POST /api/response` 與 `GET /api/responses` 都要求 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`，否則 403；secret 未設定時一律拒絕（fail-closed）。通行碼由課程公告發布，學員在問卷第一頁輸入（`sessionStorage` 暫存），不進 repo。前端收到 403 時顯示導引並提供「回去修改通行碼」按鈕，修改後直接跳回完成頁。
+- **節流**：每 IP 每分鐘最多 5 次 POST（KV 計數、TTL 120 秒，key 前綴 `rl:`），超過回 429。
+- **總量上限**：新增回覆超過 300 筆回 503（同 uid 覆蓋不受限），作為 KV 灌爆保險絲。
+- **noindex**：前端 `<meta name="robots" content="noindex,nofollow">`。
+- 部署所在 repo：`my-humble-house/workshop`（GitHub Pages，網址 `https://my-humble-house.github.io/workshop/`）。
 
 ### 前端調整
 

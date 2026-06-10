@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
 <title>Claude 工作坊 課前調查</title>
 <style>
-  /* ===== 基礎設定：全部使用裝置內建字型 ===== */
+  /* ===== 清水模毛玻璃設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
   :root{
-    --ink:#1C2B27;          /* 主要文字 */
-    --green:#17463B;        /* 主色：深綠 */
-    --green-soft:#E3EDE9;   /* 主色淡底 */
-    --amber:#B97A1E;        /* 強調色：琥珀（裝飾用途） */
-    --amber-text:#8F5E15;   /* 強調文字色：琥珀深化版，符合對比度 */
-    --line:#D5DCD8;         /* 邊框 */
-    --bg:#EEF1EF;           /* 頁面底色 */
-    --card:#FFFFFF;
-    --muted:#5E6E68;
+    --ink:#242826;             /* 唯一文字深色：除襯底與標籤外所有文字同色 */
+    --accent:#2B2F2D;          /* 炭墨跳色：選中、主按鈕、進度、標籤襯底 */
+    --accent-press:#1A1D1C;
+    --on-dark:#EFF1EE;         /* 深色襯底上的文字 */
+    --bg:#A8ABA6;              /* 深清水模灰 */
+    --glass:rgba(244,245,243,.55);
+    --glass-solid:rgba(244,245,243,.93);
+    --row:rgba(255,255,255,.6);
+    --line:rgba(255,255,255,.7);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -24,38 +25,49 @@
     background:var(--bg);
     color:var(--ink);
     display:flex;justify-content:center;align-items:flex-start;
-    padding:32px 16px;
+    padding:40px 16px;
     line-height:1.7;
   }
+  /* ===== 幾何背景：與卡片同色系、僅靠透明度融入 ===== */
+  .geo{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
   .card{
+    position:relative;z-index:1;
     width:100%;max-width:620px;
-    background:var(--card);
-    border:1.5px solid var(--line);
-    border-radius:16px;
-    padding:36px 32px 28px;
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(18px);
+    backdrop-filter:blur(18px);
+    border:1px solid var(--line);
+    border-radius:30px 30px 76px 30px;
+    box-shadow:0 22px 46px rgba(42,46,44,.22);
+    padding:36px 34px 30px;
+  }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .card{background:var(--glass-solid)}
   }
   /* ===== 進度條 ===== */
-  .progress-wrap{margin-bottom:28px}
-  .progress-label{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.14em;margin-bottom:8px;display:flex;justify-content:space-between}
-  .progress-bar{height:4px;background:var(--green-soft);border-radius:2px;overflow:hidden}
-  .progress-fill{height:100%;background:var(--green);width:0%;transition:width .3s ease}
+  .progress-wrap{margin-bottom:20px}
+  .progress-label{font-size:11px;font-weight:600;letter-spacing:.2em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+  .p-num{font-size:26px;font-weight:600;letter-spacing:0;line-height:1}
+  .p-total{font-size:13px;font-weight:600;letter-spacing:0}
+  .progress-bar{height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .3s ease}
   @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
   /* ===== 題目區 ===== */
-  .eyebrow{font-size:13px;color:var(--amber-text);letter-spacing:.14em;font-weight:600;margin-bottom:10px}
   h1{font-size:24px;font-weight:700;line-height:1.45;margin-bottom:6px}
   h2{font-size:20px;font-weight:700;line-height:1.5;margin-bottom:6px}
-  .hint{font-size:14px;color:var(--muted);margin-bottom:22px}
-  /* ===== 選項按鈕 ===== */
+  h3{font-size:12px;font-weight:700;letter-spacing:.22em;margin-bottom:12px}
+  .hint{font-size:14px;margin-bottom:16px}
+  /* ===== 選項按鈕（選單類，保持規則矩形） ===== */
   .options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
   .opt{
     width:100%;text-align:left;
     font-size:16px;font-family:inherit;color:var(--ink);
-    background:#FAFBFA;border:1.5px solid var(--line);border-radius:10px;
-    padding:13px 16px;cursor:pointer;
+    background:var(--row);border:1.5px solid transparent;border-radius:11px;
+    padding:13px 18px;cursor:pointer;
   }
-  .opt:hover{border-color:var(--green)}
-  .opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-  .opt.selected{border-color:var(--green);background:var(--green-soft);font-weight:600}
+  .opt:hover{border-color:var(--accent)}
+  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-dark);font-weight:600}
   /* ===== 輸入欄位 ===== */
   .field{margin-bottom:18px}
   .field-row{display:flex;gap:12px}
@@ -64,49 +76,84 @@
   .field label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
   input[type=text],textarea{
     width:100%;font-size:16px;font-family:inherit;color:var(--ink);
-    border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;background:#FAFBFA;
+    border:1.5px solid transparent;border-radius:11px;padding:12px 16px;background:var(--row);
   }
-  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--green)}
+  input[type=text]::placeholder,textarea::placeholder{color:var(--ink);opacity:.45}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
   textarea{min-height:96px;resize:vertical}
-  /* ===== 導覽按鈕 ===== */
+  /* ===== 導覽按鈕：膠囊形 ===== */
   .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .btn{
     font-size:15px;font-family:inherit;font-weight:600;
-    border-radius:10px;padding:11px 22px;cursor:pointer;border:1.5px solid transparent;
+    border-radius:99px;padding:12px 28px;cursor:pointer;border:1.5px solid transparent;
   }
-  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-  .btn-primary{background:var(--green);color:#fff}
-  .btn-primary:hover{background:#0F362D}
-  .btn-ghost{background:none;border-color:var(--line);color:var(--muted)}
-  .btn-ghost:hover{border-color:var(--green);color:var(--green)}
-  .error{color:#A03020;font-size:14px;margin:-12px 0 16px;display:none}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn-primary{background:var(--accent);color:var(--on-dark)}
+  .btn-primary:hover{background:var(--accent-press)}
+  .btn-ghost{background:none;color:var(--ink);padding:12px 10px}
+  .btn-ghost:hover{text-decoration:underline}
+  /* 錯誤提示：炭墨填底膠囊，不用紅色 */
+  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-dark);font-size:13px;font-weight:600;border-radius:99px;padding:6px 16px;margin:-10px 0 16px}
   /* ===== 結果頁 ===== */
   .summary{
-    border:1.5px solid var(--line);border-radius:10px;background:#FAFBFA;
+    background:var(--row);border-radius:14px;
     padding:16px;font-size:16px;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:18px;
   }
   .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .copied{color:var(--green);font-size:14px;font-weight:600;display:none}
-  .footer-note{font-size:13px;color:var(--muted);margin-top:24px}
+  .copied{font-size:14px;font-weight:600;display:none}
+  .footer-note{font-size:13px;margin-top:24px}
   .other-wrap{display:none;margin-top:-2px}
   .other-wrap.show{display:block}
   /* ===== 完成後的共同統計 ===== */
-  .stats{margin-top:32px}
+  .stats{margin-top:32px;border-top:1px solid var(--line);padding-top:20px}
   .stats h2{margin-bottom:4px}
   .stats .hint{margin-bottom:16px}
-  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:16px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:14px}
   .bar-label{flex:0 0 11em}
-  .bar-track{flex:1;height:20px;background:var(--green-soft);border-radius:4px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--green)}
-  .bar-num{flex:0 0 2em;text-align:right;font-weight:600;color:var(--green)}
+  .bar-track{flex:1;height:18px;background:var(--row);border-radius:99px;overflow:hidden}
+  .bar-fill{display:block;height:100%;background:var(--accent);border-radius:99px}
+  .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
   .task-list{list-style:none;margin-top:8px}
-  .task-list li{font-size:16px;padding:10px 0}
-  .task-list .dept-tag{color:var(--amber-text);font-weight:600;font-size:13px;letter-spacing:.14em;margin-right:8px}
+  .task-list li{font-size:15px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
+  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
   @media (max-width:480px){.bar-label{flex-basis:8em}}
-  @media (max-width:480px){.card{padding:28px 20px 22px}h1{font-size:21px}h2{font-size:18px}}
+  @media (max-width:480px){.card{padding:28px 22px 24px;border-radius:24px 24px 52px 24px}h1{font-size:21px}h2{font-size:18px}}
 </style>
 </head>
 <body>
+<svg class="geo" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter></defs>
+  <circle cx="1100" cy="130" r="170" fill="#F4F5F3" opacity=".15" filter="url(#soft)"/>
+  <circle cx="380" cy="780" r="160" fill="#F4F5F3" opacity=".14" filter="url(#soft)"/>
+  <circle cx="1050" cy="150" r="150" fill="none" stroke="#F4F5F3" stroke-opacity=".5" stroke-width="1.5"/>
+  <circle cx="1050" cy="150" r="100" fill="none" stroke="#F4F5F3" stroke-opacity=".32" stroke-width="1.5"/>
+  <circle cx="1050" cy="150" r="52" fill="#F4F5F3" opacity=".14"/>
+  <polygon points="430,560 580,820 280,820" fill="#F4F5F3" opacity=".16" transform="rotate(14 430 710)"/>
+  <polygon points="450,580 600,840 300,840" fill="none" stroke="#F4F5F3" stroke-opacity=".45" stroke-width="1.5" transform="rotate(14 450 730)"/>
+  <line x1="560" y1="170" x2="720" y2="70" stroke="#F4F5F3" stroke-opacity=".42" stroke-width="1.5"/>
+  <line x1="600" y1="200" x2="760" y2="100" stroke="#F4F5F3" stroke-opacity=".28" stroke-width="1.5"/>
+  <line x1="640" y1="230" x2="800" y2="130" stroke="#F4F5F3" stroke-opacity=".18" stroke-width="1.5"/>
+  <rect x="1010" y="590" width="150" height="150" fill="none" stroke="#F4F5F3" stroke-opacity=".45" stroke-width="1.5" transform="rotate(45 1085 665)"/>
+  <rect x="1045" y="625" width="95" height="95" fill="#F4F5F3" opacity=".14" transform="rotate(45 1092 672)"/>
+  <circle cx="440" cy="760" r="130" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
+  <circle cx="440" cy="760" r="88" fill="none" stroke="#F4F5F3" stroke-opacity=".25" stroke-width="1.5"/>
+  <line x1="370" y1="330" x2="510" y2="250" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
+  <line x1="370" y1="370" x2="510" y2="290" stroke="#F4F5F3" stroke-opacity=".25" stroke-width="1.5"/>
+  <rect x="370" y="90" width="80" height="80" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(45 410 130)"/>
+  <line x1="940" y1="840" x2="1100" y2="760" stroke="#F4F5F3" stroke-opacity=".38" stroke-width="1.5"/>
+  <line x1="980" y1="870" x2="1140" y2="790" stroke="#F4F5F3" stroke-opacity=".24" stroke-width="1.5"/>
+  <circle cx="1180" cy="430" r="60" fill="none" stroke="#F4F5F3" stroke-opacity=".35" stroke-width="1.5"/>
+  <circle cx="300" cy="430" r="4" fill="#F4F5F3" opacity=".55"/>
+  <circle cx="330" cy="460" r="3" fill="#F4F5F3" opacity=".4"/>
+  <circle cx="880" cy="60" r="3.5" fill="#F4F5F3" opacity=".5"/>
+  <circle cx="1150" cy="350" r="4" fill="#F4F5F3" opacity=".45"/>
+  <circle cx="620" cy="850" r="4" fill="#F4F5F3" opacity=".5"/>
+  <circle cx="660" cy="820" r="3" fill="#F4F5F3" opacity=".35"/>
+  <polygon points="190,180 320,410 60,410" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(14 190 320)"/>
+  <circle cx="160" cy="700" r="110" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
+  <rect x="1280" y="620" width="120" height="120" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(45 1340 680)"/>
+  <circle cx="1340" cy="200" r="120" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
+</svg>
 <div class="card">
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>
@@ -207,6 +254,11 @@ QUESTIONS.forEach(q => {
   else answers[q.id] = "";
 });
 const otherTexts = {};              // 各題「其他」選項的自填內容
+let resumeStep = 0;                 // 從完成頁回去改通行碼後,下一步直接跳回完成頁
+
+/* 課程通行碼:線上版提交與讀統計都需要,不進入回覆文字,僅存當前分頁 */
+let classCode = "";
+try{ classCode = sessionStorage.getItem("classCode") || ""; }catch(e){}
 
 const $screen = document.getElementById("screen");
 
@@ -223,18 +275,17 @@ function updateProgress(){
   const fill = document.getElementById("progressFill");
   const count = document.getElementById("progressCount");
   const sec = document.getElementById("progressSection");
-  if(step === 0){ fill.style.width = "0%"; count.textContent = ""; sec.textContent = "基本資料"; }
+  if(step === 0){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "基本資料"; }
   else if(step <= TOTAL){
     fill.style.width = Math.round(step/ (TOTAL+1) *100) + "%";
-    count.textContent = "第 " + step + " 題，共 " + TOTAL + " 題";
+    count.innerHTML = '<span class="p-num">' + String(step).padStart(2,"0") + '</span><span class="p-total">／' + TOTAL + '</span>';
     sec.textContent = QUESTIONS[step-1].section;
-  } else { fill.style.width = "100%"; count.textContent = ""; sec.textContent = "完成"; }
+  } else { fill.style.width = "100%"; count.innerHTML = ""; sec.textContent = "完成"; }
 }
 
 /* --- 基本資料頁 --- */
 function renderIntro(){
   $screen.innerHTML = `
-    <div class="eyebrow">CLAUDE 工作坊・課前調查</div>
     <h1>開始之前，先認識你一下</h1>
     <p class="hint">共 ${TOTAL} 題，約 5 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
     <div class="field-row">
@@ -251,7 +302,12 @@ function renderIntro(){
       <label for="fJob">主要工作內容（一句話即可）</label>
       <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
     </div>
-    <p class="error" id="err">請填寫姓名與所屬部門。</p>
+    ${location.protocol !== "file:" ? `
+    <div class="field">
+      <label for="fCode">課程通行碼</label>
+      <input type="text" id="fCode" value="${esc(classCode)}" placeholder="寫在課程公告裡" autocomplete="off">
+    </div>` : ""}
+    <p class="error" id="err"></p>
     <div class="nav">
       <span></span>
       <button class="btn btn-primary" id="nextBtn">開始作答</button>
@@ -260,10 +316,19 @@ function renderIntro(){
     answers.name = document.getElementById("fName").value.trim();
     answers.dept = document.getElementById("fDept").value.trim();
     answers.job  = document.getElementById("fJob").value.trim();
+    const $err = document.getElementById("err");
     if(!answers.name || !answers.dept){
-      document.getElementById("err").style.display = "block"; return;
+      $err.textContent = "請填寫姓名與所屬部門。"; $err.style.display = "block"; return;
     }
-    step = 1; render();
+    const $code = document.getElementById("fCode");
+    if($code){
+      classCode = $code.value.trim();
+      if(!classCode){
+        $err.textContent = "請填寫課程通行碼（在課程公告裡）。"; $err.style.display = "block"; return;
+      }
+      try{ sessionStorage.setItem("classCode", classCode); }catch(e){}
+    }
+    step = resumeStep || 1; resumeStep = 0; render();
   });
 }
 
@@ -298,10 +363,10 @@ function renderQuestion(q){
       </div>`:""}
     </div>`;
   }
+  /* 進度列已顯示大數字題號,畫面標題去掉「Qn.」前綴;複製回傳的文字仍保留完整題號 */
   $screen.innerHTML = `
-    <div class="eyebrow">${q.section}</div>
-    <h2>${q.title}</h2>
-    ${q.hint?`<p class="hint">${q.hint}</p>`:`<div style="height:14px"></div>`}
+    <h2>${q.title.replace(/^Q\d+\.\s*/, "")}</h2>
+    ${q.hint?`<p class="hint">${q.hint}</p>`:`<div style="height:10px"></div>`}
     ${body}
     <p class="error" id="err">請至少選擇一個選項。</p>
     <div class="nav">
@@ -439,7 +504,7 @@ function buildPayload(){
 async function submitShared(payload){
   const r = await fetch(API_BASE + "/api/response", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type": "application/json", "X-Class-Code": classCode},
     body: JSON.stringify(payload)
   });
   if(!r.ok) throw new Error("submit failed: " + r.status);
@@ -448,7 +513,14 @@ async function submitShared(payload){
 /* 讀取所有回覆並彙整;清單更新有短暫延遲,自己剛送出的回覆若還沒出現就先補進統計 */
 async function loadShared($box, mine){
   try{
-    const r = await fetch(API_BASE + "/api/responses");
+    const r = await fetch(API_BASE + "/api/responses", { headers: {"X-Class-Code": classCode} });
+    if(r.status === 403){
+      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼不正確，統計無法載入（你的回覆仍可在上方複製或下載）。請回到第一頁，確認課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">回去修改通行碼</button>';
+      document.getElementById("codeBackBtn").addEventListener("click", ()=>{
+        resumeStep = TOTAL + 1; step = 0; render();
+      });
+      return;
+    }
     if(!r.ok) throw new Error("load failed: " + r.status);
     let list = await r.json();
     if(mine && !list.some(d => d.uid === mine.uid)) list = list.concat(mine);
@@ -469,13 +541,14 @@ async function loadShared($box, mine){
 }
 
 /* 繪製統計畫面:主題長條 + 各部門實作任務方向 */
+const BAR_SHADES = ["#2B2F2D","#4A4F4C","#6B6F6B","#8A8D88"];   // 依名次由深到淺(規範定義的單色階)
 function renderStats($box, topicCount, deptCount, tasks, n){
   const entries = Object.entries(topicCount).sort((a,b) => b[1] - a[1]);
   const maxV = entries.length ? entries[0][1] : 1;
-  const bars = entries.map(([c, v]) =>
+  const bars = entries.map(([c, v], i) =>
     `<div class="bar-row">
       <span class="bar-label">${c} ${CATEGORY_NAMES[c] || ""}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%"></span></span>
+      <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${BAR_SHADES[Math.min(i, BAR_SHADES.length-1)]}"></span></span>
       <span class="bar-num">${v}</span>
     </div>`).join("");
   const latest = tasks.sort((a,b) => b.ts - a.ts).slice(0, 8).map(t =>
@@ -522,7 +595,6 @@ function buildResultText(){
 function renderDone(){
   const result = buildResultText();
   $screen.innerHTML = `
-    <div class="eyebrow">完成</div>
     <h1>填寫完成，最後一步</h1>
     <p class="hint">請點「複製回覆內容」，然後貼到回傳給課程窗口的訊息或郵件中。</p>
     <div class="summary" id="summary">${esc(result)}</div>
