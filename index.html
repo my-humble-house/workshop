@@ -46,9 +46,8 @@
   }
   /* ===== 進度條 ===== */
   .progress-wrap{margin-bottom:20px}
-  .progress-label{font-size:11px;font-weight:600;letter-spacing:.2em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
-  .p-num{font-size:26px;font-weight:600;letter-spacing:0;line-height:1}
-  .p-total{font-size:13px;font-weight:600;letter-spacing:0}
+  .progress-label{font-size:16px;font-weight:600;letter-spacing:.2em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+  .p-num,.p-total{font-size:16px;font-weight:600;letter-spacing:0;line-height:1}
   .progress-bar{height:4px;background:var(--line);border-radius:99px;overflow:hidden}
   .progress-fill{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .3s ease}
   @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
@@ -100,8 +99,6 @@
     padding:16px;font-size:16px;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:18px;
   }
   .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .copied{font-size:14px;font-weight:600;display:none}
-  .footer-note{font-size:13px;margin-top:24px}
   .other-wrap{display:none;margin-top:-2px}
   .other-wrap.show{display:block}
   /* ===== 完成後的共同統計 ===== */
@@ -312,10 +309,12 @@ function renderGate(){
       if(r.ok){
         classCode = code;
         try{ sessionStorage.setItem("classCode", code); }catch(e){}
+        console.log("[survey] class-code verified");
         gateOk = true; render(); return;
       }
       showErr(r.status === 403 ? "通行碼不正確，請確認課程公告。" : "驗證服務暫時無法使用，請稍後再試。");
     }catch(e){
+      console.log("[survey] class-code verification failed", e);
       showErr("連線失敗，請確認網路後再試。");
     }
     $btn.disabled = false; $btn.textContent = "進入問卷";
@@ -393,7 +392,7 @@ function renderQuestion(q){
       </div>`:""}
     </div>`;
   }
-  /* 進度列已顯示大數字題號,畫面標題去掉「Qn.」前綴;複製回傳的文字仍保留完整題號 */
+  /* 進度列已顯示題號,畫面標題去掉「Qn.」前綴;摘要文字仍保留完整題號 */
   $screen.innerHTML = `
     <h2>${q.title.replace(/^Q\d+\.\s*/, "")}</h2>
     ${q.hint?`<p class="hint">${q.hint}</p>`:`<div style="height:10px"></div>`}
@@ -532,12 +531,18 @@ function buildPayload(){
 }
 
 async function submitShared(payload){
-  const r = await fetch(API_BASE + "/api/response", {
-    method: "POST",
-    headers: {"Content-Type": "application/json", "X-Class-Code": classCode},
-    body: JSON.stringify(payload)
-  });
-  if(!r.ok) throw new Error("submit failed: " + r.status);
+  try{
+    const r = await fetch(API_BASE + "/api/response", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "X-Class-Code": classCode},
+      body: JSON.stringify(payload)
+    });
+    if(!r.ok) throw new Error("submit failed: " + r.status);
+    console.log("[survey] anonymous aggregate submitted");
+  }catch(e){
+    console.log("[survey] anonymous aggregate submit failed", e);
+    throw e;
+  }
 }
 
 /* 讀取所有回覆並彙整;清單更新有短暫延遲,自己剛送出的回覆若還沒出現就先補進統計 */
@@ -545,7 +550,7 @@ async function loadShared($box, mine){
   try{
     const r = await fetch(API_BASE + "/api/responses", { headers: {"X-Class-Code": classCode} });
     if(r.status === 403){
-      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼已失效，統計無法載入（你的回覆仍可在上方複製或下載）。請重新輸入課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">重新輸入通行碼</button>';
+      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼已失效，統計無法載入。你的填答摘要仍保留在上方，請重新輸入課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">重新輸入通行碼</button>';
       document.getElementById("codeBackBtn").addEventListener("click", ()=>{
         classCode = ""; gateOk = false; render();
       });
@@ -564,9 +569,11 @@ async function loadShared($box, mine){
       if(d.dept) deptCount[d.dept] = (deptCount[d.dept]||0) + 1;
       if(d.task) tasks.push({dept: d.dept, task: d.task, ts: d.ts || 0});
     });
+    console.log("[survey] shared stats loaded", {count:list.length});
     renderStats($box, topicCount, deptCount, tasks, list.length);
   }catch(e){
-    $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的回覆不受影響，仍可在上方複製或下載。</p>';
+    console.log("[survey] shared stats load failed", e);
+    $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
   }
 }
 
@@ -626,48 +633,35 @@ function renderDone(){
   const result = buildResultText();
   $screen.innerHTML = `
     <h1>填寫完成，最後一步</h1>
-    <p class="hint">請點「複製回覆內容」，然後貼到回傳給課程窗口的訊息或郵件中。</p>
+    <p class="hint">以下是你的填答摘要，匿名統計會顯示在下方。</p>
     <div class="summary" id="summary">${esc(result)}</div>
     <div class="done-actions">
-      <button class="btn btn-primary" id="copyBtn">複製回覆內容</button>
-      <button class="btn btn-ghost" id="dlBtn">下載成文字檔</button>
-      <button class="btn btn-ghost" id="editBtn">回去修改</button>
+      <button class="btn btn-ghost" id="editBtn">回上一步</button>
     </div>
-    <span class="copied" id="copiedMsg">已複製，請貼上回傳給課程窗口。</span>
-    <div class="stats" id="statsBox"></div>
-    <p class="footer-note" id="footNote">關閉視窗前請務必先複製或下載你的回覆。</p>`;
+    <div class="stats" id="statsBox"></div>`;
 
   /* 網頁版:寫入共用統計後顯示大家的方向;離線 HTML 檔:說明統計僅線上網址可見 */
   const $statsBox = document.getElementById("statsBox");
   if(location.protocol !== "file:"){
     $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">統計載入中。</p>';
     const mine = buildPayload();
-    submitShared(mine)
-      .catch(()=>{ /* 提交失敗不阻擋完成頁,學員仍可複製或下載回覆 */ })
-      .then(() => loadShared($statsBox, mine));
+    (async ()=>{
+      try{
+        try{
+          await submitShared(mine);
+        }catch(e){
+          console.log("[survey] continuing after aggregate submit failure", e);
+        }
+        await loadShared($statsBox, mine);
+      }catch(e){
+        console.log("[survey] completion stats flow failed", e);
+        $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
+      }
+    })();
   } else {
-    $statsBox.innerHTML = "";
-    document.getElementById("footNote").textContent =
-      "你開啟的是離線 HTML 檔，回覆只存在你的畫面上，關閉視窗前請務必先複製或下載。若想看其他同仁的填答統計，請改用課程公告的線上問卷網址填寫。";
+    $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你開啟的是離線 HTML 檔，統計只會在線上問卷顯示。</p>';
   }
 
-  document.getElementById("copyBtn").addEventListener("click", async ()=>{
-    try{ await navigator.clipboard.writeText(result); }
-    catch(e){
-      /* 舊版瀏覽器備援：用隱藏 textarea 複製 */
-      const t = document.createElement("textarea");
-      t.value = result; document.body.appendChild(t);
-      t.select(); document.execCommand("copy"); t.remove();
-    }
-    document.getElementById("copiedMsg").style.display = "inline";
-  });
-  document.getElementById("dlBtn").addEventListener("click", ()=>{
-    const blob = new Blob([result], {type:"text/plain;charset=utf-8"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "課前調查_" + (answers.name || "回覆") + ".txt";
-    a.click(); URL.revokeObjectURL(a.href);
-  });
   document.getElementById("editBtn").addEventListener("click", ()=>{ step = TOTAL; render(); });
 }
 
