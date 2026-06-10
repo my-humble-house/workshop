@@ -84,7 +84,7 @@
   /* ===== 導覽按鈕：膠囊形 ===== */
   .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .btn{
-    font-size:15px;font-family:inherit;font-weight:600;
+    font-size:16px;font-family:inherit;font-weight:600;
     border-radius:99px;padding:12px 28px;cursor:pointer;border:1.5px solid transparent;
   }
   .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -97,8 +97,18 @@
   /* ===== 結果頁 ===== */
   .summary{
     background:var(--row);border-radius:14px;
-    padding:16px;font-size:16px;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:18px;
+    padding:14px 16px;font-size:16px;line-height:1.55;margin-bottom:18px;
   }
+  .summary-head,.summary-tags{display:flex;flex-wrap:wrap;gap:6px 14px}
+  .summary-head{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+  .summary-head span,.summary-tags span,.summary-head strong,.summary-tags strong{font-size:16px}
+  .summary-head strong,.summary-tags strong{font-weight:600;margin-right:4px}
+  .summary-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .summary-item{display:grid;grid-template-columns:minmax(168px,15em) 1fr;gap:4px 12px;align-items:start}
+  .summary-q,.summary-a{font-size:16px}
+  .summary-q{font-weight:600}
+  .summary-a{overflow-wrap:anywhere}
+  .summary-tags{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
   .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .other-wrap{display:none;margin-top:-2px}
   .other-wrap.show{display:block}
@@ -113,44 +123,63 @@
   .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
   .task-list{list-style:none;margin-top:8px}
   .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
-  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:16px;border-radius:99px;padding:2px 10px}
+  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
   @media (max-width:480px){.bar-label{flex-basis:8em}}
+  @media (max-width:480px){.summary-item{grid-template-columns:1fr;gap:2px}.summary{padding:13px 14px}}
   @media (max-width:480px){.card{padding:28px 22px 24px;border-radius:24px 24px 52px 24px}h1{font-size:21px}h2{font-size:18px}}
 </style>
 </head>
 <body>
 <svg class="geo" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
   <defs><filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter></defs>
-  <circle cx="1100" cy="130" r="170" fill="#F4F5F3" opacity=".15" filter="url(#soft)"/>
-  <circle cx="380" cy="780" r="160" fill="#F4F5F3" opacity=".14" filter="url(#soft)"/>
-  <circle cx="1050" cy="150" r="150" fill="none" stroke="#F4F5F3" stroke-opacity=".5" stroke-width="1.5"/>
-  <circle cx="1050" cy="150" r="100" fill="none" stroke="#F4F5F3" stroke-opacity=".32" stroke-width="1.5"/>
-  <circle cx="1050" cy="150" r="52" fill="#F4F5F3" opacity=".14"/>
-  <polygon points="430,560 580,820 280,820" fill="#F4F5F3" opacity=".16" transform="rotate(14 430 710)"/>
-  <polygon points="450,580 600,840 300,840" fill="none" stroke="#F4F5F3" stroke-opacity=".45" stroke-width="1.5" transform="rotate(14 450 730)"/>
-  <line x1="560" y1="170" x2="720" y2="70" stroke="#F4F5F3" stroke-opacity=".42" stroke-width="1.5"/>
-  <line x1="600" y1="200" x2="760" y2="100" stroke="#F4F5F3" stroke-opacity=".28" stroke-width="1.5"/>
-  <line x1="640" y1="230" x2="800" y2="130" stroke="#F4F5F3" stroke-opacity=".18" stroke-width="1.5"/>
-  <rect x="1010" y="590" width="150" height="150" fill="none" stroke="#F4F5F3" stroke-opacity=".45" stroke-width="1.5" transform="rotate(45 1085 665)"/>
-  <rect x="1045" y="625" width="95" height="95" fill="#F4F5F3" opacity=".14" transform="rotate(45 1092 672)"/>
-  <circle cx="440" cy="760" r="130" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
-  <circle cx="440" cy="760" r="88" fill="none" stroke="#F4F5F3" stroke-opacity=".25" stroke-width="1.5"/>
-  <line x1="370" y1="330" x2="510" y2="250" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
-  <line x1="370" y1="370" x2="510" y2="290" stroke="#F4F5F3" stroke-opacity=".25" stroke-width="1.5"/>
-  <rect x="370" y="90" width="80" height="80" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(45 410 130)"/>
-  <line x1="940" y1="840" x2="1100" y2="760" stroke="#F4F5F3" stroke-opacity=".38" stroke-width="1.5"/>
-  <line x1="980" y1="870" x2="1140" y2="790" stroke="#F4F5F3" stroke-opacity=".24" stroke-width="1.5"/>
-  <circle cx="1180" cy="430" r="60" fill="none" stroke="#F4F5F3" stroke-opacity=".35" stroke-width="1.5"/>
-  <circle cx="300" cy="430" r="4" fill="#F4F5F3" opacity=".55"/>
-  <circle cx="330" cy="460" r="3" fill="#F4F5F3" opacity=".4"/>
-  <circle cx="880" cy="60" r="3.5" fill="#F4F5F3" opacity=".5"/>
-  <circle cx="1150" cy="350" r="4" fill="#F4F5F3" opacity=".45"/>
-  <circle cx="620" cy="850" r="4" fill="#F4F5F3" opacity=".5"/>
-  <circle cx="660" cy="820" r="3" fill="#F4F5F3" opacity=".35"/>
-  <polygon points="190,180 320,410 60,410" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(14 190 320)"/>
-  <circle cx="160" cy="700" r="110" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
-  <rect x="1280" y="620" width="120" height="120" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5" transform="rotate(45 1340 680)"/>
-  <circle cx="1340" cy="200" r="120" fill="none" stroke="#F4F5F3" stroke-opacity=".4" stroke-width="1.5"/>
+  <circle cx="1070" cy="140" r="190" fill="#F4F5F3" opacity=".16" filter="url(#soft)"/>
+  <circle cx="310" cy="730" r="180" fill="#F4F5F3" opacity=".14" filter="url(#soft)"/>
+  <g fill="none" stroke="#F4F5F3" stroke-width="1.5">
+    <circle cx="1070" cy="155" r="150" stroke-opacity=".5"/>
+    <circle cx="1070" cy="155" r="104" stroke-opacity=".34"/>
+    <circle cx="1070" cy="155" r="58" stroke-opacity=".2"/>
+    <circle cx="210" cy="685" r="126" stroke-opacity=".44"/>
+    <circle cx="210" cy="685" r="82" stroke-opacity=".26"/>
+    <circle cx="1210" cy="520" r="78" stroke-opacity=".36"/>
+    <circle cx="1210" cy="520" r="34" stroke-opacity=".2"/>
+  </g>
+  <g fill="#F4F5F3">
+    <polygon points="405,548 548,800 262,800" opacity=".18" transform="rotate(11 405 716)"/>
+    <polygon points="188,168 306,386 70,386" opacity=".15" transform="rotate(-10 188 300)"/>
+    <rect x="1018" y="612" width="116" height="116" opacity=".14" transform="rotate(45 1076 670)"/>
+    <rect x="340" y="105" width="62" height="62" opacity=".14" transform="rotate(45 371 136)"/>
+  </g>
+  <g fill="none" stroke="#F4F5F3" stroke-width="1.5">
+    <polygon points="432,520 584,788 280,788" stroke-opacity=".46" transform="rotate(11 432 692)"/>
+    <polygon points="202,142 336,386 68,386" stroke-opacity=".42" transform="rotate(-10 202 282)"/>
+    <rect x="985" y="585" width="170" height="170" stroke-opacity=".46" transform="rotate(45 1070 670)"/>
+    <rect x="330" y="88" width="92" height="92" stroke-opacity=".4" transform="rotate(45 376 134)"/>
+    <rect x="1258" y="664" width="112" height="112" stroke-opacity=".38" transform="rotate(45 1314 720)"/>
+  </g>
+  <g stroke="#F4F5F3" stroke-width="1.5">
+    <line x1="540" y1="140" x2="710" y2="42" stroke-opacity=".46"/>
+    <line x1="582" y1="174" x2="752" y2="76" stroke-opacity=".32"/>
+    <line x1="624" y1="208" x2="794" y2="110" stroke-opacity=".2"/>
+    <line x1="738" y1="782" x2="912" y2="684" stroke-opacity=".44"/>
+    <line x1="780" y1="816" x2="954" y2="718" stroke-opacity=".3"/>
+    <line x1="822" y1="850" x2="996" y2="752" stroke-opacity=".18"/>
+    <line x1="108" y1="466" x2="246" y2="388" stroke-opacity=".38"/>
+    <line x1="108" y1="506" x2="246" y2="428" stroke-opacity=".24"/>
+  </g>
+  <g fill="#F4F5F3">
+    <circle cx="300" cy="430" r="4" opacity=".55"/>
+    <circle cx="332" cy="460" r="3" opacity=".42"/>
+    <circle cx="364" cy="492" r="2.5" opacity=".3"/>
+    <circle cx="846" cy="76" r="3.5" opacity=".52"/>
+    <circle cx="888" cy="106" r="2.5" opacity=".35"/>
+    <circle cx="1160" cy="346" r="4" opacity=".46"/>
+    <circle cx="1200" cy="374" r="2.8" opacity=".32"/>
+    <circle cx="620" cy="850" r="4" opacity=".5"/>
+    <circle cx="662" cy="820" r="3" opacity=".36"/>
+    <circle cx="704" cy="790" r="2.5" opacity=".24"/>
+    <circle cx="1320" cy="210" r="4" opacity=".46"/>
+    <circle cx="1354" cy="244" r="3" opacity=".32"/>
+  </g>
 </svg>
 <div class="card">
   <div class="progress-wrap" id="progressWrap">
@@ -214,11 +243,8 @@ const QUESTIONS = [
   {id:"q12", section:"第三部分・需求與期待", type:"single",
    title:"Q12. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
    options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
-  {id:"q13", section:"第三部分・需求與期待", type:"text",
-   title:"Q13. 這次工作坊你最希望解決的一個問題是什麼？",
-   placeholder:"自由填寫"},
-  {id:"q14", section:"第三部分・需求與期待", type:"multitext",
-   title:"Q14. 課堂實作題：描述一個你想在課堂上完成的真實任務",
+  {id:"q13", section:"第三部分・需求與期待", type:"multitext",
+   title:"Q13. 課堂實作題：描述一個你想在課堂上完成的真實任務",
    hint:"工作坊會直接用你的任務帶你做完,寫得越具體,課堂收穫越大。",
    fields:[
      {key:"task", label:"這個任務是什麼", ph:"例:每週一要發四間館的 IG 文案,共 8 則", required:true},
@@ -490,7 +516,7 @@ function buildCategoryTags(){
   if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
   if(a.q10.includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
   if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定") diag.add("C").add("D");
-  if(a.q14.task) diag.add("D");                                  // 有固定實作任務,需要 Project
+  if(a.q13.task) diag.add("D");                                  // 有固定實作任務,需要 Project
   if(a.q7 === "整份檔案直接上傳") diag.add("E");
   if(a.q8.includes("掃描檔或紙本拍照") || a.q8.includes("手機截圖")) diag.add("E");
   if(a.q10.includes("數字加總或計算結果出錯") || a.q10.includes("讀取掃描檔或圖片時認錯字")) diag.add("E");
@@ -523,7 +549,7 @@ function buildPayload(){
     dept: answers.dept,
     topics: tags.chosenRaw,
     diag: tags.diagRaw,
-    task: (answers.q14.task || "").slice(0, 120),
+    task: (answers.q13.task || "").slice(0, 120),
     ts: Date.now()
   };
 }
