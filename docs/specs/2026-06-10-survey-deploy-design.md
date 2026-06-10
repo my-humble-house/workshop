@@ -44,7 +44,7 @@ Workers KV（key 格式 resp:<uid>）
 
 威脅模型：頁面網址公開可被發現（公開 repo＋搜尋引擎），Worker 網址寫在前端原始碼，CORS 擋不了 curl 等腳本。對策：
 
-- **課程通行碼**：進站第一個畫面是鎖定頁，輸入通行碼後呼叫 `GET /api/verify` 即時驗證，通過才渲染問卷；`POST /api/response`、`GET /api/responses`、`GET /api/verify` 都要求 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`，否則 403；secret 未設定時一律拒絕（fail-closed）。通行碼由課程公告發布（`sessionStorage` 暫存，同分頁重新整理時自動重新驗證），不進 repo。完成頁讀統計若遇 403（通行碼事後被更換），顯示導引並可重新輸入。
+- **課程通行碼／邀請碼**：進站第一個畫面是鎖定頁，輸入通行碼後呼叫 `GET /api/verify` 即時驗證，通過才渲染問卷；`POST /api/response`、`GET /api/responses`、`GET /api/verify` 都要求 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`，否則 403；secret 未設定時一律拒絕（fail-closed）。通行碼由課程公告發布（`sessionStorage` 暫存，同分頁重新整理時自動重新驗證），不進 repo，不寫入前端 placeholder 或任何公開文件。完成頁讀統計若遇 403（通行碼事後被更換），顯示導引並可重新輸入。
 - **節流**：每 IP 每分鐘最多 5 次 POST（KV 計數、TTL 120 秒，key 前綴 `rl:`），超過回 429。
 - **總量上限**：新增回覆超過 300 筆回 503（同 uid 覆蓋不受限），作為 KV 灌爆保險絲。
 - **noindex**：前端 `<meta name="robots" content="noindex,nofollow">`。
