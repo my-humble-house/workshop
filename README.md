@@ -9,7 +9,7 @@
 
 ## 存取防護
 
-- **課程通行碼**：提交回覆與讀取統計都需要 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`（`cd worker && npx wrangler secret put CLASS_CODE` 設定／更換），學員在問卷第一頁輸入，通行碼隨課程公告發布、不進 repo。
+- **課程通行碼**：開啟網址後第一個畫面是通行碼鎖定頁，輸入後即向 `GET /api/verify` 驗證，通過才能看到問卷；提交回覆與讀取統計同樣要求 `X-Class-Code` 標頭等於 Worker secret `CLASS_CODE`（`cd worker && npx wrangler secret put CLASS_CODE` 設定／更換）。通行碼隨課程公告發布、不進 repo。
 - **節流**：每 IP 每分鐘最多 5 次提交；回覆總量上限 300 筆（同人重填覆蓋不受限）。
 - **noindex**：頁面標示 `noindex,nofollow`，降低被搜尋引擎收錄的機率。
 

@@ -2,6 +2,7 @@
  * 課前調查共同統計 API
  * POST /api/response  提交匿名彙整（同一 uid 重填覆蓋）
  * GET  /api/responses 回傳全部匿名回覆陣列
+ * GET  /api/verify    驗證通行碼（前端進站鎖定頁使用）
  *
  * KV 只存匿名欄位（dept/topics/diag/task/ts），不存姓名與完整作答。
  *
@@ -85,9 +86,14 @@ export default {
     try {
       const isSubmit = url.pathname === "/api/response" && request.method === "POST";
       const isList = url.pathname === "/api/responses" && request.method === "GET";
+      const isVerify = url.pathname === "/api/verify" && request.method === "GET";
 
-      if ((isSubmit || isList) && !authorized(request, env)) {
+      if ((isSubmit || isList || isVerify) && !authorized(request, env)) {
         return json({ ok: false, error: "forbidden" }, 403, headers);
+      }
+
+      if (isVerify) {
+        return json({ ok: true }, 200, headers);
       }
 
       if (isSubmit) {

@@ -254,18 +254,19 @@ QUESTIONS.forEach(q => {
   else answers[q.id] = "";
 });
 const otherTexts = {};              // 各題「其他」選項的自填內容
-let resumeStep = 0;                 // 從完成頁回去改通行碼後,下一步直接跳回完成頁
 
-/* 課程通行碼:線上版提交與讀統計都需要,不進入回覆文字,僅存當前分頁 */
+/* 課程通行碼:線上版進站即須通過 Worker 驗證;不進入回覆文字,僅存當前分頁 */
 let classCode = "";
 try{ classCode = sessionStorage.getItem("classCode") || ""; }catch(e){}
+let gateOk = location.protocol === "file:";   // 離線 HTML 檔無統計功能,不設門禁
 
 const $screen = document.getElementById("screen");
 
 /* ====== 畫面渲染 ====== */
 function render(){
   updateProgress();
-  if(step === 0) renderIntro();
+  if(!gateOk) renderGate();
+  else if(step === 0) renderIntro();
   else if(step >= 1 && step <= TOTAL) renderQuestion(QUESTIONS[step-1]);
   else renderDone();
   window.scrollTo({top:0});
@@ -275,12 +276,55 @@ function updateProgress(){
   const fill = document.getElementById("progressFill");
   const count = document.getElementById("progressCount");
   const sec = document.getElementById("progressSection");
-  if(step === 0){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "基本資料"; }
+  if(!gateOk){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "課程通行碼"; }
+  else if(step === 0){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "基本資料"; }
   else if(step <= TOTAL){
     fill.style.width = Math.round(step/ (TOTAL+1) *100) + "%";
     count.innerHTML = '<span class="p-num">' + String(step).padStart(2,"0") + '</span><span class="p-total">／' + TOTAL + '</span>';
     sec.textContent = QUESTIONS[step-1].section;
   } else { fill.style.width = "100%"; count.innerHTML = ""; sec.textContent = "完成"; }
+}
+
+/* --- 通行碼鎖定頁:進站第一個畫面,通過 Worker 驗證才能看到問卷 --- */
+function renderGate(){
+  $screen.innerHTML = `
+    <h1>輸入課程通行碼</h1>
+    <p class="hint">本問卷僅供工作坊學員填寫。通行碼寫在課程公告裡，輸入後即可開始作答。</p>
+    <div class="field">
+      <label for="gCode">課程通行碼</label>
+      <input type="text" id="gCode" value="${esc(classCode)}" placeholder="寫在課程公告裡" autocomplete="off">
+    </div>
+    <p class="error" id="err"></p>
+    <div class="nav">
+      <span></span>
+      <button class="btn btn-primary" id="gateBtn">進入問卷</button>
+    </div>`;
+  const $input = document.getElementById("gCode");
+  const $btn = document.getElementById("gateBtn");
+  const $err = document.getElementById("err");
+  function showErr(msg){ $err.textContent = msg; $err.style.display = "block"; }
+  async function verify(){
+    const code = $input.value.trim();
+    if(!code){ showErr("請輸入通行碼。"); $input.focus(); return; }
+    $btn.disabled = true; $btn.textContent = "確認中…"; $err.style.display = "none";
+    try{
+      const r = await fetch(API_BASE + "/api/verify", { headers: {"X-Class-Code": code} });
+      if(r.ok){
+        classCode = code;
+        try{ sessionStorage.setItem("classCode", code); }catch(e){}
+        gateOk = true; render(); return;
+      }
+      showErr(r.status === 403 ? "通行碼不正確，請確認課程公告。" : "驗證服務暫時無法使用，請稍後再試。");
+    }catch(e){
+      showErr("連線失敗，請確認網路後再試。");
+    }
+    $btn.disabled = false; $btn.textContent = "進入問卷";
+    $input.focus();
+  }
+  $btn.addEventListener("click", verify);
+  $input.addEventListener("keydown", e => { if(e.key === "Enter") verify(); });
+  /* 同分頁內重新整理:已存的通行碼自動驗證,通過就直接進入 */
+  if(classCode) verify(); else $input.focus();
 }
 
 /* --- 基本資料頁 --- */
@@ -302,12 +346,7 @@ function renderIntro(){
       <label for="fJob">主要工作內容（一句話即可）</label>
       <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
     </div>
-    ${location.protocol !== "file:" ? `
-    <div class="field">
-      <label for="fCode">課程通行碼</label>
-      <input type="text" id="fCode" value="${esc(classCode)}" placeholder="寫在課程公告裡" autocomplete="off">
-    </div>` : ""}
-    <p class="error" id="err"></p>
+    <p class="error" id="err">請填寫姓名與所屬部門。</p>
     <div class="nav">
       <span></span>
       <button class="btn btn-primary" id="nextBtn">開始作答</button>
@@ -316,19 +355,10 @@ function renderIntro(){
     answers.name = document.getElementById("fName").value.trim();
     answers.dept = document.getElementById("fDept").value.trim();
     answers.job  = document.getElementById("fJob").value.trim();
-    const $err = document.getElementById("err");
     if(!answers.name || !answers.dept){
-      $err.textContent = "請填寫姓名與所屬部門。"; $err.style.display = "block"; return;
+      document.getElementById("err").style.display = "block"; return;
     }
-    const $code = document.getElementById("fCode");
-    if($code){
-      classCode = $code.value.trim();
-      if(!classCode){
-        $err.textContent = "請填寫課程通行碼（在課程公告裡）。"; $err.style.display = "block"; return;
-      }
-      try{ sessionStorage.setItem("classCode", classCode); }catch(e){}
-    }
-    step = resumeStep || 1; resumeStep = 0; render();
+    step = 1; render();
   });
 }
 
@@ -515,9 +545,9 @@ async function loadShared($box, mine){
   try{
     const r = await fetch(API_BASE + "/api/responses", { headers: {"X-Class-Code": classCode} });
     if(r.status === 403){
-      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼不正確，統計無法載入（你的回覆仍可在上方複製或下載）。請回到第一頁，確認課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">回去修改通行碼</button>';
+      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼已失效，統計無法載入（你的回覆仍可在上方複製或下載）。請重新輸入課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">重新輸入通行碼</button>';
       document.getElementById("codeBackBtn").addEventListener("click", ()=>{
-        resumeStep = TOTAL + 1; step = 0; render();
+        classCode = ""; gateOk = false; render();
       });
       return;
     }
