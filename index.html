@@ -6,883 +6,1211 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Claude 工作坊 課前調查</title>
 <style>
-  /* ===== 寒舍集團內部表單設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
-  :root{
-    --mhh-black:#050505;
-    --mhh-ink:#2C2A24;
-    --mhh-muted:#666666;
-    --mhh-blue:#3B5D6B;
-    --mhh-sage:#8FAF9B;
-    --mhh-bronze:#81603F;
-    --mhh-paper:#FFFFFF;
-    --mhh-porcelain:#F6F6F6;
-    --mhh-warm:#EFEAE1;
-    --ink:var(--mhh-ink);                  /* 唯一內容文字色：內部表單黑褐墨色 */
-    --accent:var(--mhh-blue);              /* 選中、主按鈕、進度、標籤襯底 */
-    --accent-press:#284450;
-    --on-accent:#FFFFFF;
-    --bg:var(--mhh-porcelain);
-    --paper:rgba(255,255,255,.94);
-    --row:rgba(255,255,255,.86);
-    --line:rgba(59,93,107,.24);
-    --line-strong:rgba(59,93,107,.52);
-    --shadow:rgba(44,42,36,.12);
-    --bar-1:var(--mhh-blue);
-    --bar-2:var(--mhh-sage);
-    --bar-3:var(--mhh-bronze);
-    --bar-4:#666666;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    width:100%;
-    display:flex;justify-content:center;align-items:flex-start;
-    padding:36px 16px;
-    line-height:1.7;
-    overflow-x:hidden;
-  }
-  /* ===== CSS 內部表單底圖：官網式留白、細線與低彩度，不使用 SVG 或分割圖 ===== */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:
-      linear-gradient(145deg,rgba(255,255,255,.92) 0%,rgba(246,246,246,.94) 48%,rgba(239,234,225,.78) 100%);
-  }
-  .card{
-    position:relative;z-index:1;
-    width:min(100%,700px);min-width:0;
-    background:var(--paper);
-    -webkit-backdrop-filter:blur(10px);
-    backdrop-filter:blur(10px);
-    border:1px solid var(--line);
-    border-top:4px solid var(--mhh-black);
-    border-radius:4px;
-    box-shadow:0 20px 54px var(--shadow);
-    padding:30px 34px 28px;
-  }
-  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-    .card{background:var(--mhh-paper)}
-  }
-  /* ===== 品牌標頭：使用 repo-local 官方 logo，避免外部熱連 ===== */
-  .brand-masthead{
-    display:flex;align-items:center;gap:20px;
-    padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);
-  }
-  .brand-lockup{display:flex;align-items:center;gap:16px;min-width:0}
-  .brand-logo{width:92px;height:auto;flex:none;display:block}
-  .brand-copy{min-width:0}
-  .brand-kicker{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--mhh-blue);line-height:1.4}
-  .brand-title{font-size:20px;font-weight:700;letter-spacing:.18em;line-height:1.45;margin-top:2px}
-  .brand-subtitle{font-size:13px;color:var(--mhh-muted);letter-spacing:.08em;line-height:1.5;margin-top:2px}
-  /* ===== 進度條 ===== */
-  .progress-wrap{margin-bottom:20px}
-  .progress-label{font-size:16px;font-weight:600;letter-spacing:.18em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
-  .progress-label span{font-size:16px}
-  .p-num,.p-total{font-size:16px;font-weight:600;letter-spacing:0;line-height:1}
-  .progress-bar{height:3px;background:rgba(59,93,107,.16);border-radius:0;overflow:hidden}
-  .progress-fill{height:100%;background:var(--accent);border-radius:0;width:0%;transition:width .3s ease}
-  @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
-  /* ===== 題目區 ===== */
-  h1{font-size:24px;font-weight:700;line-height:1.45;margin-bottom:6px;letter-spacing:.04em}
-  h2{font-size:20px;font-weight:700;line-height:1.5;margin-bottom:6px;letter-spacing:.03em}
-  h3{font-size:12px;font-weight:700;letter-spacing:.22em;margin-bottom:12px;color:var(--mhh-blue)}
-  .hint{font-size:14px;margin-bottom:16px}
-  /* ===== 選項按鈕（選單類，保持規則矩形） ===== */
-  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-  .opt{
-    width:100%;text-align:left;
-    font-size:16px;font-family:inherit;color:var(--ink);
-    background:var(--row);border:1px solid var(--line);border-left:3px solid var(--line);
-    border-radius:2px;padding:13px 18px;cursor:pointer;
-  }
-  .opt:hover{border-color:var(--line-strong);border-left-color:var(--mhh-sage)}
-  .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
-  /* ===== 輸入欄位 ===== */
-  .field{margin-bottom:18px}
-  .field-row{display:flex;gap:12px}
-  .field-row .field{flex:1}
-  @media (max-width:480px){.field-row{flex-direction:column;gap:0}}
-  .field label{display:block;font-size:16px;font-weight:600;margin-bottom:6px}
-  input[type=text],textarea{
-    width:100%;font-size:16px;font-family:inherit;color:var(--ink);
-    border:1px solid var(--line);border-radius:2px;padding:12px 16px;background:var(--row);
-  }
-  input[type=text]::placeholder,textarea::placeholder{color:var(--ink);opacity:.45}
-  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
-  textarea{min-height:96px;resize:vertical}
-  /* ===== 導覽按鈕：膠囊形 ===== */
-  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .btn{
-    font-size:16px;font-family:inherit;font-weight:600;
-    border-radius:2px;padding:12px 28px;cursor:pointer;border:1px solid transparent;
-  }
-  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .btn-primary{background:var(--mhh-black);color:var(--on-accent)}
-  .btn-primary:hover{background:var(--accent-press)}
-  .btn-ghost{background:none;color:var(--ink);padding:12px 10px}
-  .btn-ghost:hover{text-decoration:underline}
-  /* 錯誤提示：同色票襯底膠囊，不用紅色 */
-  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;border-radius:2px;padding:6px 16px;margin:-10px 0 16px}
-  /* ===== 結果頁 ===== */
-  .summary{
-    position:relative;font-size:16px;line-height:1.55;margin-bottom:18px;
-  }
-  .summary-clip{position:relative;overflow:hidden;max-height:var(--summary-collapsed-height,360px)}
-  .summary:not(.expanded) .summary-clip{
-    -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 56px),transparent);
-    mask-image:linear-gradient(to bottom,#000 calc(100% - 56px),transparent);
-  }
-  .summary.expanded .summary-clip{max-height:none;-webkit-mask-image:none;mask-image:none}
-  .summary-title{font-size:18px;font-weight:700;margin-bottom:8px}
-  .summary-head,.summary-tags{display:flex;flex-wrap:wrap;gap:6px 14px}
-  .summary-head{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
-  .summary-head span,.summary-tags span,.summary-head strong,.summary-tags strong{font-size:16px}
-  .summary-head strong,.summary-tags strong{font-weight:600;margin-right:4px}
-  .summary-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-  .summary-item{font-size:16px}
-  .summary-q,.summary-a{display:inline;font-size:16px}
-  .summary-q{font-weight:600}
-  .summary-a::before{content:"：";font-weight:400}
-  .summary-a{overflow-wrap:anywhere}
-  .summary-tags{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
-  .summary-toggle{
-    display:flex;align-items:center;gap:6px;margin:10px auto 0;padding:8px 4px;
-    border:0;background:none;color:var(--ink);font-size:16px;font-family:inherit;font-weight:600;cursor:pointer;
-  }
-  .summary-toggle::after{
-    content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;
-    transform:rotate(45deg);transition:transform .2s ease;margin-top:-4px;
-  }
-  .summary-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
-  .summary.expanded .summary-toggle::after{transform:rotate(225deg);margin-top:4px}
-  .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .other-wrap{display:none;margin-top:-2px}
-  .other-wrap.show{display:block}
-  /* ===== 完成後的共同統計 ===== */
-  .stats{margin-top:32px;border-top:1px solid var(--line);padding-top:20px}
-  .stats h2{margin-bottom:4px}
-  .stats .hint{font-size:16px;margin-bottom:16px}
-  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:16px}
-  .bar-label{flex:0 0 11em}
-  .bar-track{flex:1;height:18px;background:var(--row);border:1px solid var(--line);border-radius:2px;overflow:hidden}
-  .bar-fill{display:block;height:100%;background:var(--accent);border-radius:0}
-  .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
-  .task-list{list-style:none;margin-top:8px}
-  .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
-  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:2px;padding:2px 10px}
-  /* ===== 結果頁:自選/診斷雙列長條、部門欄、圖例 ===== */
-  .legend{font-size:16px;margin-bottom:12px}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
-  .duo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:16px}
-  .duo-row .bar-label{flex:0 0 11em}
-  .duo-tracks{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
-  .duo-tracks .bar-track{height:10px}
-  .duo-nums{flex:0 0 4em;text-align:right;font-weight:600;font-size:16px}
-  .dept-cols{display:flex;gap:18px}
-  .dept-col{flex:1;min-width:0}
-  .dept-col h4{font-size:16px;font-weight:700;margin-bottom:6px}
-  .dept-col ol{padding-left:1.3em}
-  .dept-col li{font-size:16px;margin-bottom:6px}
-  .mini-num{display:block;font-size:16px}
-  .stats h3{margin-top:24px}
-  @media (max-width:560px){
-    .dept-cols{flex-direction:column;gap:10px}
-    .duo-row .bar-label{flex-basis:8em}
-  }
-  @media (max-width:480px){.bar-label{flex-basis:8em}}
-  @media (prefers-reduced-motion: reduce){.summary-toggle::after{transition:none}}
-  @media (max-width:560px){
-    body{padding:18px 12px}
-    .card{padding:22px 18px 22px;border-radius:2px}
-    .brand-masthead{align-items:flex-start;gap:14px}
-    .brand-logo{width:76px}
-    .brand-title{font-size:18px}
-    h1{font-size:21px}h2{font-size:18px}
-  }
+/* ============================================================
+   寒舍集團・Claude 工作坊 課前調查（方案 C：桌面雙欄版）
+   設計規範見 設計規範.html — 所有顏色、陰影、字級皆來自下方 tokens
+   ============================================================ */
+
+/* ===== 1. Design tokens ===== */
+:root{
+  /* 色彩（取樣自 mhh-group.com：深藍黑、紙白、沉穩綠、墨色） */
+  --c-night:#142028;            /* 側欄底、深色帶 */
+  --c-night-line:rgba(233,230,223,.35);
+  --c-paper:#FFFFFF;            /* 卡片、輸入欄 */
+  --c-bg:#F4F3F0;               /* 內容區底 */
+  --c-bg-deep:#EFEAE1;          /* 內容區漸層尾端（暖） */
+  --c-ink:#272520;              /* 主要文字 */
+  --c-muted:#6E6A61;            /* 次要文字 */
+  --c-cream:#E9E6DF;            /* 深色底上的文字 */
+  --c-accent:#3B5D6B;           /* 強調：選中、主按鈕、進度 */
+  --c-accent-deep:#284450;      /* 強調 hover/重壓 */
+  --c-accent-soft:rgba(59,93,107,.09);
+  --c-sage:#9FB8AB;             /* 深色底上的強調綠 */
+  --c-bronze:#81603F;           /* 警示/資安重點（不用紅） */
+  --c-line:rgba(44,42,36,.16);
+  --c-line-strong:rgba(44,42,36,.38);
+
+  /* 邊界陰影與光暈 */
+  --shadow-side:6px 0 28px rgba(20,32,40,.16);                            /* 側欄右緣 */
+  --shadow-card:0 2px 6px rgba(20,32,40,.05),0 14px 34px rgba(20,32,40,.08);
+  --shadow-card-hover:0 4px 10px rgba(20,32,40,.07),0 18px 44px rgba(20,32,40,.12);
+  --glow-accent:0 0 0 3px rgba(59,93,107,.14),0 6px 20px rgba(59,93,107,.16);  /* 選中 */
+  --glow-focus:0 0 0 3px rgba(59,93,107,.18),0 6px 18px rgba(59,93,107,.12);   /* 輸入聚焦 */
+  --glow-sage:0 0 14px rgba(159,184,171,.55);                              /* 深色底上的綠光 */
+  --shadow-btn:0 6px 18px rgba(59,93,107,.22);
+  --shadow-btn-hover:0 8px 26px rgba(59,93,107,.32);
+
+  /* 字體 */
+  --font-display:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;     /* 標題、大數字 */
+  --font-body:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+
+  /* 圓角 */
+  --r-s:2px;   /* 輸入欄、按鈕、選項 */
+  --r-m:5px;   /* 卡片 */
+}
+
+/* ===== 2. Base ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:var(--font-body);background:var(--c-bg);color:var(--c-ink);line-height:1.7;font-size:16px}
+button{font-family:inherit}
+input,textarea{font-family:inherit}
+
+/* ===== 3. 版面：側欄 + 內容 ===== */
+.app{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+.side{
+  background:var(--c-night);color:var(--c-cream);
+  display:flex;flex-direction:column;
+  padding:36px 28px 30px;
+  position:sticky;top:0;height:100vh;
+  box-shadow:var(--shadow-side);z-index:2;
+}
+.side-brand{display:flex;flex-direction:column;gap:2px}
+.side-logo{width:86px;height:auto;display:block;margin-bottom:16px}
+.side-kicker{font-size:10.5px;font-weight:600;letter-spacing:.32em;color:var(--c-sage)}
+.side-title{font-family:var(--font-display);font-size:25px;font-weight:700;letter-spacing:.12em;color:#F4F1EA}
+.main{padding:66px 76px 80px;background:linear-gradient(160deg,#F6F5F2 0%,var(--c-bg) 60%,var(--c-bg-deep) 100%)}
+.content{max-width:680px}
+
+/* ===== 4. 側欄：部分清單（空心圈 → 打勾） ===== */
+.checklist{list-style:none;margin-top:40px;display:flex;flex-direction:column;gap:5px}
+.checklist li{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:var(--r-m);
+  font-size:14.5px;color:rgba(233,230,223,.48);
+  transition:background .25s ease,color .25s ease;
+}
+.checklist li.current{background:rgba(255,255,255,.08);color:#FFFFFF}
+.checklist li.done{color:rgba(233,230,223,.8)}
+.cl-mark{
+  flex:none;width:18px;height:18px;display:grid;place-items:center;
+  border:1.5px solid var(--c-night-line);border-radius:50%;
+  transition:border-color .25s ease,background .25s ease,box-shadow .25s ease;
+}
+.checklist li.current .cl-mark{border-color:var(--c-sage);box-shadow:var(--glow-sage)}
+.checklist li.done .cl-mark{background:var(--c-sage);border-color:var(--c-sage)}
+.checklist li.done .cl-mark::after{
+  content:"";width:4px;height:8px;margin-top:-2px;
+  border-right:2px solid var(--c-night);border-bottom:2px solid var(--c-night);transform:rotate(42deg);
+}
+.cl-title{flex:1;font-weight:600}
+.cl-count{font-size:11.5px;opacity:.55;font-variant-numeric:tabular-nums}
+.side-foot{margin-top:auto;padding-top:20px}
+.side-count{font-size:13px;color:rgba(233,230,223,.66);font-variant-numeric:tabular-nums}
+.side-count strong{font-size:17px;color:#FFFFFF}
+.side-bar{height:3px;background:rgba(255,255,255,.14);margin-top:10px;border-radius:99px;overflow:hidden}
+.side-bar i{display:block;height:100%;background:var(--c-sage);transition:width .35s ease;box-shadow:var(--glow-sage)}
+
+/* ===== 5. 文字階層 ===== */
+.sv-display{font-family:var(--font-display);font-weight:700;letter-spacing:.06em}
+.sv-kicker{font-size:12px;font-weight:700;letter-spacing:.24em;color:var(--c-accent);margin-bottom:10px}
+.sv-title{font-family:var(--font-display);font-size:29px;font-weight:700;line-height:1.45;letter-spacing:.03em;margin-bottom:8px;text-wrap:pretty}
+.sv-hint{font-size:14px;color:var(--c-muted);margin-bottom:18px}
+.sv-lede{font-size:16px;color:var(--c-muted);max-width:34em;margin-bottom:26px;text-wrap:pretty}
+.sv-label{display:flex;align-items:baseline;gap:10px;font-size:15px;font-weight:600;margin-bottom:8px}
+.sv-label-note{font-size:13px;font-weight:400;color:var(--c-muted)}
+.sv-req{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--c-accent);border-radius:var(--r-s);padding:1px 8px}
+
+/* ===== 6. 步驟切換動畫 ===== */
+@media (prefers-reduced-motion: no-preference){
+  .sv-step.from-right{animation:svFromRight .38s cubic-bezier(.2,.75,.25,1)}
+  .sv-step.from-left{animation:svFromLeft .38s cubic-bezier(.2,.75,.25,1)}
+}
+@keyframes svFromRight{from{transform:translateX(26px)}to{transform:none}}
+@keyframes svFromLeft{from{transform:translateX(-26px)}to{transform:none}}
+
+/* ===== 7. 選項 ===== */
+.sv-options{display:flex;flex-direction:column;gap:9px;margin-bottom:22px}
+.sv-opt{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  font-size:16px;color:var(--c-ink);line-height:1.55;
+  background:var(--c-paper);border:1px solid var(--c-line);border-radius:var(--r-s);
+  padding:13px 18px;cursor:pointer;box-shadow:var(--shadow-card);
+  transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+.sv-opt:hover{border-color:var(--c-line-strong);box-shadow:var(--shadow-card-hover)}
+.sv-opt:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+.sv-opt.selected{border-color:var(--c-accent);background:var(--c-accent-soft);font-weight:600;box-shadow:var(--glow-accent)}
+@media (prefers-reduced-motion: no-preference){.sv-opt:active{transform:scale(.99)}}
+.sv-mark{flex:none;width:20px;height:20px;border:1.5px solid var(--c-line-strong);position:relative;transition:background .15s ease,border-color .15s ease}
+.sv-mark.radio{border-radius:50%}
+.sv-mark.check{border-radius:5px}
+.sv-mark.on{background:var(--c-accent);border-color:var(--c-accent)}
+.sv-mark.radio.on::after{content:"";position:absolute;inset:4.5px;border-radius:50%;background:#fff}
+.sv-mark.check.on::after{
+  content:"";position:absolute;left:4.5px;top:2.5px;width:7px;height:11px;
+  border-right:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(42deg);
+}
+@media (prefers-reduced-motion: no-preference){
+  .sv-mark.check.on::after{animation:svPop .22s cubic-bezier(.3,1.6,.5,1)}
+  .sv-mark.radio.on::after{animation:svPopDot .22s cubic-bezier(.3,1.6,.5,1)}
+}
+@keyframes svPop{from{transform:scale(.8) rotate(42deg)}to{transform:scale(1) rotate(42deg)}}
+@keyframes svPopDot{from{transform:scale(.85)}to{transform:scale(1)}}
+.sv-other{padding-left:34px}
+.sv-other input{width:100%}
+
+/* ===== 8. 主題卡（Q14） ===== */
+.sv-topic-count{font-size:14px;color:var(--c-muted);margin-bottom:12px}
+.sv-topic-count strong{color:var(--c-accent);font-size:18px}
+.sv-topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+@media (max-width:680px){.sv-topic-grid{grid-template-columns:1fr}}
+.sv-topic{
+  display:flex;align-items:flex-start;gap:12px;text-align:left;
+  font-size:15px;line-height:1.5;color:var(--c-ink);
+  background:var(--c-paper);border:1px solid var(--c-line);border-radius:var(--r-s);
+  padding:14px 16px;cursor:pointer;box-shadow:var(--shadow-card);
+  transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
+}
+.sv-topic:hover{border-color:var(--c-line-strong);box-shadow:var(--shadow-card-hover)}
+.sv-topic:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+.sv-topic.selected{border-color:var(--c-accent);background:var(--c-accent-soft);box-shadow:var(--glow-accent)}
+.sv-topic-code{
+  flex:none;width:26px;height:26px;display:grid;place-items:center;
+  font-family:var(--font-display);font-size:14px;font-weight:700;
+  border:1px solid var(--c-line-strong);border-radius:var(--r-s);color:var(--c-muted);
+}
+.sv-topic.selected .sv-topic-code{background:var(--c-accent);border-color:var(--c-accent);color:#fff}
+.sv-topic-label{flex:1}
+.sv-topic .sv-mark{margin-top:3px;width:18px;height:18px;opacity:0}
+.sv-topic.selected .sv-mark{opacity:1}
+.sv-topic.selected .sv-mark.check.on::after{left:4px;top:1.5px;width:6px;height:10px}
+
+/* ===== 9. 晶片 ===== */
+.sv-chips{display:flex;flex-wrap:wrap;gap:8px}
+.sv-chip{
+  font-size:15px;color:var(--c-ink);background:var(--c-paper);
+  border:1px solid var(--c-line);border-radius:99px;padding:8px 18px;cursor:pointer;
+  box-shadow:var(--shadow-card);
+  transition:border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease;
+}
+.sv-chip:hover{border-color:var(--c-line-strong);box-shadow:var(--shadow-card-hover)}
+.sv-chip:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+.sv-chip.selected{background:var(--c-accent);border-color:var(--c-accent);color:#fff;font-weight:600;box-shadow:var(--glow-accent)}
+
+/* ===== 10. 欄位 ===== */
+.sv-fields{display:flex;flex-direction:column;gap:20px;margin-bottom:22px}
+.sv-field{}
+input[type=text],textarea{
+  width:100%;font-size:16px;color:var(--c-ink);line-height:1.6;
+  border:1px solid var(--c-line);border-radius:var(--r-s);
+  padding:12px 16px;background:var(--c-paper);
+}
+input[type=text]::placeholder,textarea::placeholder{color:var(--c-muted);opacity:.7}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--c-accent);box-shadow:var(--glow-focus)}
+textarea{min-height:84px;resize:vertical}
+
+/* ===== 11. 按鈕與導覽 ===== */
+.sv-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+.sv-btn{
+  font-size:16px;font-weight:600;border-radius:var(--r-s);
+  padding:12px 30px;cursor:pointer;border:1px solid transparent;
+  transition:background .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+.sv-btn:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+.sv-btn.primary{background:var(--c-accent);color:#fff;box-shadow:var(--shadow-btn)}
+.sv-btn.primary:hover{background:var(--c-accent-deep);box-shadow:var(--shadow-btn-hover)}
+.sv-btn.primary:disabled{opacity:.6;cursor:default}
+@media (prefers-reduced-motion: no-preference){.sv-btn.primary:active{transform:scale(.98)}}
+.sv-btn.ghost{background:none;color:var(--c-muted);padding:12px 12px;box-shadow:none}
+.sv-btn.ghost:hover{color:var(--c-ink);text-decoration:underline}
+
+/* ===== 12. 錯誤提示 ===== */
+.sv-error{
+  width:fit-content;font-size:14px;font-weight:600;color:var(--c-accent-deep);
+  background:var(--c-accent-soft);border-left:3px solid var(--c-accent);
+  padding:7px 14px;margin:0 0 16px;border-radius:var(--r-s);
+}
+@media (prefers-reduced-motion: no-preference){.sv-error{animation:svShake .3s ease}}
+@keyframes svShake{0%,100%{transform:none}30%{transform:translateX(-5px)}60%{transform:translateX(4px)}}
+
+/* ===== 13. 歡迎頁 ===== */
+.sv-welcome .sv-display{font-size:46px;margin-bottom:14px}
+.sv-gate{margin-top:4px}
+.sv-gate-row{display:flex;gap:10px}
+.sv-gate-row input{flex:1}
+.sv-gate-row .sv-btn{flex:none;white-space:nowrap}
+.sv-demo-note{font-size:12.5px;color:var(--c-muted);margin-top:10px;font-family:ui-monospace,monospace;letter-spacing:.02em}
+.sv-gate .sv-error{margin-top:12px;margin-bottom:0}
+
+/* ===== 14. 部分過場頁 ===== */
+.sv-section{
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;
+  width:100%;min-height:56vh;text-align:left;background:none;border:0;cursor:pointer;color:inherit;
+}
+.sv-section-num{font-family:var(--font-display);font-size:96px;font-weight:700;line-height:1.1;color:var(--c-accent);opacity:.92}
+.sv-section-meta{font-size:13px;font-weight:600;letter-spacing:.26em;color:var(--c-muted)}
+.sv-section-title{font-size:32px;margin-top:2px}
+.sv-section-blurb{font-size:16px;color:var(--c-muted);margin-top:6px}
+.sv-section-skip{font-size:12.5px;color:var(--c-muted);opacity:.7;margin-top:26px;letter-spacing:.1em}
+@media (prefers-reduced-motion: no-preference){
+  .sv-section > *{animation:svRise .5s cubic-bezier(.2,.75,.25,1) both}
+  .sv-section-title{animation-delay:.06s}
+  .sv-section-blurb{animation-delay:.12s}
+  .sv-section-skip{animation-delay:.4s}
+}
+@keyframes svRise{from{transform:translateY(12px)}to{transform:none}}
+
+/* ===== 15. 實作頁 ===== */
+.sv-subq{margin-bottom:22px}
+.sv-note-toggle{background:none;border:0;font-size:13px;color:var(--c-accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-weight:400}
+.sv-note{font-size:13.5px;color:var(--c-muted);background:var(--c-accent-soft);border-radius:var(--r-s);padding:10px 14px;margin-bottom:10px;max-width:46em}
+
+/* ===== 16. 完成頁與統計 ===== */
+.st-sending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:320px;color:var(--c-muted)}
+.st-spinner{width:34px;height:34px;border:3px solid var(--c-accent-soft);border-top-color:var(--c-accent);border-radius:50%}
+@media (prefers-reduced-motion: no-preference){.st-spinner{animation:stSpin .8s linear infinite}}
+@keyframes stSpin{to{transform:rotate(360deg)}}
+.st-confirm{display:flex;align-items:center;gap:18px;margin-bottom:26px}
+.st-check{flex:none;width:52px;height:52px;border-radius:50%;background:var(--c-accent);position:relative;box-shadow:var(--glow-accent)}
+.st-check::after{
+  content:"";position:absolute;left:18px;top:13px;width:13px;height:22px;
+  border-right:3px solid #fff;border-bottom:3px solid #fff;transform:rotate(42deg);
+}
+@media (prefers-reduced-motion: no-preference){
+  .st-check{animation:svPopDot .4s cubic-bezier(.3,1.7,.5,1)}
+  .st-check::after{animation:svPop .3s .15s cubic-bezier(.3,1.6,.5,1) both}
+}
+.st-h{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:.04em;margin:0 0 10px}
+.st-sub{font-size:13.5px;color:var(--c-muted);margin-bottom:14px;text-wrap:pretty}
+.st-plan{border:1px solid var(--c-line);border-radius:var(--r-m);padding:18px 20px 14px;margin-bottom:18px;background:var(--c-paper);box-shadow:var(--shadow-card)}
+.st-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.st-chip{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;border-radius:99px;padding:6px 16px 6px 8px;white-space:nowrap}
+.st-chip-code{width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font-family:var(--font-display);font-size:12.5px}
+.st-chip.sel{background:var(--c-accent);color:#fff}
+.st-chip.sel .st-chip-code{background:rgba(255,255,255,.22)}
+.st-chip.diag{border:1.5px solid var(--c-accent);color:var(--c-accent-deep);background:var(--c-paper)}
+.st-chip.diag .st-chip-code{background:var(--c-accent-soft);color:var(--c-accent-deep)}
+.st-plan .st-sub{margin-bottom:2px}
+.st-summary{margin-bottom:24px}
+.st-summary-toggle{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--c-accent-deep);padding:4px 0}
+.st-caret{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;transition:transform .2s ease}
+.st-summary.open .st-caret{transform:rotate(225deg);margin-top:3px}
+.st-summary-body{border:1px solid var(--c-line);border-radius:var(--r-m);padding:16px 20px;margin-top:10px;background:var(--c-paper);box-shadow:var(--shadow-card)}
+.st-summary-head{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:14px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--c-line)}
+.st-summary-head strong{margin-right:6px}
+.st-summary-body ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.st-summary-body li strong{display:block;font-weight:600}
+.st-summary-body li span{color:var(--c-muted);overflow-wrap:anywhere}
+.st-stats{border-top:1px solid var(--c-line);padding-top:20px}
+.st-stats-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px}
+.st-switch{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;cursor:pointer;color:var(--c-muted)}
+.st-switch input{position:absolute;opacity:0;width:0;height:0}
+.st-switch-track{width:38px;height:22px;border-radius:99px;background:var(--c-line);position:relative;transition:background .2s ease}
+.st-switch-track::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.st-switch input:checked + .st-switch-track{background:var(--c-accent);box-shadow:var(--glow-accent)}
+.st-switch input:checked + .st-switch-track::after{transform:translateX(16px)}
+.st-switch input:focus-visible + .st-switch-track{outline:2px solid var(--c-accent);outline-offset:2px}
+.st-headline{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+.st-big{font-family:var(--font-display);font-size:46px;font-weight:700;line-height:1;color:var(--c-accent)}
+.st-big-caption{font-size:15px;font-weight:600}
+.st-big-caption em{display:block;font-style:normal;font-weight:400;font-size:13px;color:var(--c-muted)}
+.st-bar{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14.5px}
+.st-bar-rank{flex:none;width:1.4em;font-family:var(--font-display);font-weight:700;color:var(--c-muted);font-size:15px}
+.st-bar.accent .st-bar-rank{color:var(--c-accent)}
+.st-bar-label{flex:0 0 11.5em;line-height:1.4}
+.st-bar-track{flex:1;height:16px;background:var(--c-accent-soft);border-radius:var(--r-s);overflow:hidden}
+.st-bar-fill{display:block;height:100%;background:var(--c-line-strong)}
+.st-bar.accent .st-bar-fill{background:var(--c-accent)}
+.st-bar-num{flex:0 0 1.6em;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.st-bar.small{font-size:13.5px;margin-bottom:6px}
+.st-bar.small .st-bar-label{flex-basis:9.5em}
+.st-bar.small .st-bar-track{height:11px}
+.st-bar.small .st-bar-fill{background:var(--c-accent)}
+.st-rank{margin-bottom:26px}
+.st-tasks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+@media (max-width:680px){.st-tasks{grid-template-columns:1fr}}
+.st-task{display:flex;flex-direction:column;gap:6px;border:1px solid var(--c-line);border-radius:var(--r-m);padding:12px 14px;background:var(--c-paper);box-shadow:var(--shadow-card)}
+.st-task-dept{width:fit-content;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--c-accent-deep);background:var(--c-accent-soft);border-radius:var(--r-s);padding:2px 9px}
+.st-task-text{font-size:14px;line-height:1.55}
+.st-instructor{border-top:1px dashed var(--c-line-strong);margin-top:24px;padding-top:22px}
+.st-legend{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--c-muted);margin-bottom:14px;flex-wrap:wrap}
+.st-legend .st-dot{position:static;transform:none;margin-right:2px}
+.st-legend-note{margin-left:8px}
+.st-dot{width:12px;height:12px;border-radius:50%;position:absolute;top:50%;transform:translate(-50%,-50%)}
+.st-dot.sel{background:var(--c-accent)}
+.st-dot.diag{background:var(--c-paper);border:2.5px solid var(--c-sage)}
+.st-dot.both{background:var(--c-accent);border:2.5px solid var(--c-sage);box-shadow:inset 0 0 0 2px var(--c-paper);width:15px;height:15px}
+.st-dumbbell{margin-bottom:26px}
+.st-db-row{display:flex;align-items:center;gap:14px;margin-bottom:11px;font-size:14px}
+.st-db-label{flex:0 0 13em;line-height:1.4}
+.st-db-label strong{font-family:var(--font-display);color:var(--c-accent);margin-right:4px}
+.st-db-track{flex:1;height:14px;position:relative}
+.st-db-track::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;transform:translateY(-50%);background:var(--c-accent-soft)}
+.st-db-line{position:absolute;top:50%;height:3px;transform:translateY(-50%);background:var(--c-line-strong)}
+.st-db-nums{flex:0 0 3.4em;text-align:right;font-weight:600;font-size:13.5px;font-variant-numeric:tabular-nums}
+.st-db-nums i{font-style:normal;color:var(--c-muted);font-weight:400}
+.st-dept-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px}
+@media (max-width:680px){.st-dept-cols{grid-template-columns:1fr}}
+.st-dept-col{border:1px solid var(--c-line);border-radius:var(--r-m);padding:14px 16px;background:var(--c-paper);box-shadow:var(--shadow-card)}
+.st-dept-col h4{font-size:14.5px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.st-dept-col h4 span{font-size:12px;color:var(--c-muted);font-weight:400}
+.st-dept-col ol{list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:dc}
+.st-dept-col li{font-size:13.5px;line-height:1.45;counter-increment:dc;display:flex;flex-direction:column}
+.st-dept-col li::before{content:counter(dc) ".";font-family:var(--font-display);font-weight:700;color:var(--c-muted);margin-right:4px;float:left}
+.st-dept-col li strong{font-family:var(--font-display);color:var(--c-accent)}
+.st-dept-col li i{font-style:normal;font-size:12px;color:var(--c-muted)}
+.st-sec-row{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:26px}
+@media (max-width:680px){.st-sec-row{grid-template-columns:1fr}}
+.st-callout{
+  display:flex;align-items:center;gap:14px;border:1px solid var(--c-line);border-left:3px solid var(--c-bronze);
+  border-radius:var(--r-m);padding:14px 20px;font-size:13.5px;line-height:1.5;background:var(--c-paper);box-shadow:var(--shadow-card);
+}
+.st-callout .st-big{color:var(--c-bronze);font-size:38px}
+.st-mini h4{font-size:13.5px;font-weight:700;margin-bottom:8px;color:var(--c-muted);letter-spacing:.04em}
+.st-prep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:8px}
+@media (max-width:780px){.st-prep-grid{grid-template-columns:1fr}}
+
+/* ===== 17. 響應式（窄於 900px：側欄變頂列） ===== */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;gap:18px;padding:16px 20px;box-shadow:0 6px 24px rgba(20,32,40,.18)}
+  .side-logo{width:54px;margin-bottom:0}
+  .checklist{display:none}
+  .side-foot{margin-top:0;margin-left:auto;padding-top:0;min-width:120px}
+  .main{padding:34px 22px 60px}
+  .sv-welcome .sv-display{font-size:34px}
+  .sv-title{font-size:24px}
+}
+
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="brand-masthead" aria-label="寒舍集團內部調查">
-    <div class="brand-lockup">
-      <img class="brand-logo" src="assets/mhh-logo.png" alt="寒舍餐旅管理顧問">
-      <div class="brand-copy">
-        <div class="brand-kicker">MY HUMBLE HOUSE</div>
-        <div class="brand-title">寒舍集團</div>
-        <div class="brand-subtitle">內部工作坊課前調查</div>
-      </div>
+<div class="app" id="app">
+  <aside class="side">
+    <div class="side-brand">
+      <img class="side-logo" src="assets/mhh-logo.png" alt="寒舍餐旅管理顧問">
+      <span class="side-kicker">CLAUDE 工作坊</span>
+      <span class="side-title">課前調查</span>
     </div>
-  </div>
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-  </div>
-  <div id="screen"></div>
+    <ol class="checklist" id="checklist">
+      <!-- 由 app.js 動態渲染 -->
+    </ol>
+    <div class="side-foot">
+      <span class="side-count" id="sideCount"></span>
+      <div class="side-bar"><i id="sideBarFill"></i></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content" id="screen">
+      <!-- 由 app.js 動態渲染 -->
+    </div>
+  </main>
 </div>
 
 <script>
-/* ====== 教材類別定義(與內訓教材規劃一致) ====== */
+/* 課前調查 — 題目資料與模擬統計（原型用假資料） */
+
 const CATEGORY_NAMES = {
   A:"帳號與初始設定", B:"三種模式選擇", C:"Token 與使用效率", D:"Project 建立與管理",
   E:"報表與數字處理", F:"社群文案與自動化", G:"檔案產出與 Artifacts", H:"跨部門協作",
   I:"分享與資訊安全"
 };
 
-/* ====== 題目資料 ====== */
-const QUESTIONS = [
-  {id:"q1", section:"第一部分・使用現況", type:"single",
-   title:"Q1. 你目前使用 Claude 的頻率？",
-   options:["每天多次","每天一次","每週幾次","很少用","還沒用過"], other:true},
-  {id:"q2", section:"第一部分・使用現況", type:"multi",
-   title:"Q2. 你用過哪些模式？", hint:"可複選",
-   options:["Chat 網頁版","手機 App","Cowork","Code","不確定自己用的是哪種"], other:true},
-  {id:"q3", section:"第一部分・使用現況", type:"multi",
-   title:"Q3. 你的工作固定要產出哪些東西？", hint:"可複選，不限是否用 Claude 做",
-   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表"], other:true},
-  {id:"q4", section:"第一部分・使用現況", type:"multi",
-   title:"Q4. 上面這些產出，哪些已經在用 Claude 做？", hint:"可複選",
-   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表","都還沒用 Claude 做"],
-   exclusive:"都還沒用 Claude 做"},
-  {id:"q5", section:"第二部分・使用習慣", type:"single",
-   title:"Q5. 你通常怎麼開對話？",
-   options:["一個對話從頭用到尾，什麼事都在裡面問","不同任務會開新對話","看心情，沒特別注意"], other:true},
-  {id:"q6", section:"第二部分・使用習慣", type:"single",
-   title:"Q6. 有固定背景（品牌調性、部門資訊）需要 Claude 知道時，你會怎麼做？",
-   options:["每次對話開頭重新貼一次","已經設定在 Project Instructions","不知道可以預先設定","我的工作沒有這種需求"], other:true},
-  {id:"q7", section:"第二部分・使用習慣", type:"single",
-   title:"Q7. 需要 Claude 處理檔案裡的某個數字或段落時，你會？",
-   options:["整份檔案直接上傳","只貼需要的那一段或那幾列","先截圖再上傳","沒遇過這種情況"], other:true},
-  {id:"q8", section:"第二部分・使用習慣", type:"multi",
-   title:"Q8. 你給 Claude 的檔案通常是什麼格式？", hint:"可複選",
-   options:["Excel 或 CSV","電子版 PDF","掃描檔或紙本拍照","手機截圖","不會上傳檔案"], other:true},
-  {id:"q9", section:"第二部分・使用習慣", type:"single",
-   title:"Q9. Claude 產出不符合預期時，你通常？",
-   options:["來回叫它改好幾次直到滿意","重新下一次更完整的指令","放棄，自己改","直接拿去用，沒特別發現問題"], other:true},
-  {id:"q10", section:"第二部分・使用習慣", type:"multi",
-   title:"Q10. 你是否遇過以下狀況？", hint:"可複選",
-   options:["數字加總或計算結果出錯","用到一半被告知額度用完、要等冷卻","產出的格式每次都不一樣","讀取掃描檔或圖片時認錯字","都沒遇過"], other:true},
-  {id:"q11", section:"第三部分・分享與資安", type:"multi",
-   title:"Q11. 你曾經把哪些內容貼給 Claude？", hint:"可複選，據實填寫即可，這題用來安排資安單元的深度，沒有對錯。",
-   options:["客人個資或訂位資料","內部成本或財務數字","未公開的活動或企劃內容","只有對外公開的資訊","不確定哪些可以貼","沒貼過任何內部內容"]},
-  {id:"q12", section:"第三部分・分享與資安", type:"single",
-   title:"Q12. Claude 產出的成果，你通常怎麼給同事或主管？",
-   options:["傳 Artifacts 分享連結","下載成檔案用 email 或群組傳","截圖貼群組","請對方直接看我的畫面操作","沒分享過"], other:true},
-  {id:"q13", section:"第三部分・分享與資安", type:"single",
-   title:"Q13. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
-   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
-  {id:"q14", section:"第四部分・需求與期待", type:"multi", max:3,
-   title:"Q14. 以下主題，選出你最想加強的", hint:"最多選三個",
-   options:[
-     "帳號與基本設定還不熟，想從頭學",
-     "搞懂 Chat、Cowork、Code 什麼時候用哪個",
-     "用得省：不要動不動就額度用完",
-     "固定任務設定一次就好，不用每次重新解釋",
-     "報表與數字處理：給對檔案、數字不出錯",
-     "社群文案半自動化：一次產出整週的量",
-     "產出完整檔案：簡報、Word、Excel、互動圖表",
-     "跨部門協作時怎麼共用設定與成果",
-     "搞懂分享連結與檔案的安全差別，避免內部資料外流"
-   ]},
-  {id:"q15", section:"第五部分・課堂實作", type:"multitext",
-   title:"Q15. 課堂實作題：描述一個你想在課堂上完成的真實任務",
-   hint:"工作坊會直接用你的任務帶你做完，寫得越具體，課堂收穫越大。",
-   fields:[
-     {key:"task", label:"這個任務是什麼", ph:"例：每週一要發四間館的 IG 文案，共 8 則", required:true},
-     {key:"now",  label:"現在怎麼做、多久做一次", ph:"例：每次自己想文案，大約花兩小時"}
-   ]},
-  {id:"q16", section:"第五部分・課堂實作", type:"single",
-   title:"Q16. 這個案例完成到什麼程度算成功？",
-   options:["產出可用的初稿","建好之後可以重複用的模板","明顯縮短整理時間","數字不再出錯","產出可以直接分享的檔案"], other:true},
-  {id:"q17", section:"第五部分・課堂實作", type:"multi",
-   title:"Q17. 這個案例你現場能帶什麼素材？",
-   hint:"可複選。「去識別」＝把資料裡認得出特定客人或公司機密的內容拿掉或改掉：客人姓名改成「王◯◯」或「客人 A」、電話和 email 刪除、真實營收改成比例相同的假數字。判斷方法：這份檔案如果外流，會不會認出某位客人、或洩漏內部數字？會，就要先處理。",
-   options:["去識別後的 Excel／CSV","去識別後的文件（Word、PDF）","圖片或截圖","只有文字描述就夠","還沒準備好"]},
-  {id:"q18", section:"第五部分・課堂實作", type:"single",
-   title:"Q18. 這個案例的資料有沒有使用限制？",
-   options:["我可以自己先把資料去識別再帶來","真實資料完全不能用，請幫我準備虛構範例","不確定怎麼判斷，想請講師協助改寫"]}
+const PARTS = [
+  { id:"p1", num:"一", title:"使用現況",   blurb:"先了解你現在怎麼用 Claude",       qs:["q1","q2","q3","q4"] },
+  { id:"p2", num:"二", title:"使用習慣",   blurb:"沒有標準答案，照實選就好",         qs:["q5","q6","q7","q8","q9","q10"] },
+  { id:"p3", num:"三", title:"分享與資安", blurb:"這部分用來安排資安單元的深度",     qs:["q11","q12","q13"] },
+  { id:"p4", num:"四", title:"需求與期待", blurb:"挑出你最想加強的主題",             qs:["q14"] },
+  { id:"p5", num:"五", title:"課堂實作",   blurb:"描述一個課堂上想完成的真實任務",   qs:["task"] }
 ];
 
-/* Q14 選項文字對應教材類別代號 */
-const TOPIC_MAP = {
-  "帳號與基本設定還不熟，想從頭學":"A",
-  "搞懂 Chat、Cowork、Code 什麼時候用哪個":"B",
-  "用得省：不要動不動就額度用完":"C",
-  "固定任務設定一次就好，不用每次重新解釋":"D",
-  "報表與數字處理：給對檔案、數字不出錯":"E",
-  "社群文案半自動化：一次產出整週的量":"F",
-  "產出完整檔案：簡報、Word、Excel、互動圖表":"G",
-  "跨部門協作時怎麼共用設定與成果":"H",
-  "搞懂分享連結與檔案的安全差別，避免內部資料外流":"I"
+const QUESTIONS = [
+  {id:"q1", part:"p1", type:"single",
+   title:"你目前使用 Claude 的頻率？",
+   options:["每天多次","每天一次","每週幾次","很少用","還沒用過"], other:true},
+  {id:"q2", part:"p1", type:"multi",
+   title:"你用過哪些模式？", hint:"可複選",
+   options:["Chat 網頁版","手機 App","Cowork","Code","不確定自己用的是哪種"], other:true},
+  {id:"q3", part:"p1", type:"multi",
+   title:"你的工作固定要產出哪些東西？", hint:"可複選，不限是否用 Claude 做",
+   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表"], other:true},
+  {id:"q4", part:"p1", type:"multi",
+   title:"上面這些產出，哪些已經在用 Claude 做？", hint:"可複選",
+   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表","都還沒用 Claude 做"],
+   exclusive:"都還沒用 Claude 做"},
+  {id:"q5", part:"p2", type:"single",
+   title:"你通常怎麼開對話？",
+   options:["一個對話從頭用到尾，什麼事都在裡面問","不同任務會開新對話","看心情，沒特別注意"], other:true},
+  {id:"q6", part:"p2", type:"single",
+   title:"有固定背景（品牌調性、部門資訊）需要 Claude 知道時，你會怎麼做？",
+   options:["每次對話開頭重新貼一次","已經設定在 Project Instructions","不知道可以預先設定","我的工作沒有這種需求"], other:true},
+  {id:"q7", part:"p2", type:"single",
+   title:"需要 Claude 處理檔案裡的某個數字或段落時，你會？",
+   options:["整份檔案直接上傳","只貼需要的那一段或那幾列","先截圖再上傳","沒遇過這種情況"], other:true},
+  {id:"q8", part:"p2", type:"multi",
+   title:"你給 Claude 的檔案通常是什麼格式？", hint:"可複選",
+   options:["Excel 或 CSV","電子版 PDF","掃描檔或紙本拍照","手機截圖","不會上傳檔案"], other:true},
+  {id:"q9", part:"p2", type:"single",
+   title:"Claude 產出不符合預期時，你通常？",
+   options:["來回叫它改好幾次直到滿意","重新下一次更完整的指令","放棄，自己改","直接拿去用，沒特別發現問題"], other:true},
+  {id:"q10", part:"p2", type:"multi",
+   title:"你是否遇過以下狀況？", hint:"可複選",
+   options:["數字加總或計算結果出錯","用到一半被告知額度用完、要等冷卻","產出的格式每次都不一樣","讀取掃描檔或圖片時認錯字","都沒遇過"],
+   exclusive:"都沒遇過"},
+  {id:"q11", part:"p3", type:"multi",
+   title:"你曾經把哪些內容貼給 Claude？", hint:"可複選。這題用來安排資安單元的深度，沒有對錯，據實填寫即可",
+   options:["客人個資或訂位資料","內部成本或財務數字","未公開的活動或企劃內容","只有對外公開的資訊","不確定哪些可以貼","沒貼過任何內部內容"]},
+  {id:"q12", part:"p3", type:"single",
+   title:"Claude 產出的成果，你通常怎麼給同事或主管？",
+   options:["傳 Artifacts 分享連結","下載成檔案用 email 或群組傳","截圖貼群組","請對方直接看我的畫面操作","沒分享過"], other:true},
+  {id:"q13", part:"p3", type:"single",
+   title:"你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
+   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"]},
+  {id:"q14", part:"p4", type:"topics", max:3,
+   title:"以下主題，選出你最想加強的", hint:"最多選 3 個",
+   options:[
+     {code:"A", label:"帳號與基本設定還不熟，想從頭學"},
+     {code:"B", label:"搞懂 Chat、Cowork、Code 什麼時候用哪個"},
+     {code:"C", label:"用得省：不要動不動就額度用完"},
+     {code:"D", label:"固定任務設定一次就好，不用每次重新解釋"},
+     {code:"E", label:"報表與數字處理：給對檔案、數字不出錯"},
+     {code:"F", label:"社群文案半自動化：一次產出整週的量"},
+     {code:"G", label:"產出完整檔案：簡報、Word、Excel、互動圖表"},
+     {code:"H", label:"跨部門協作時怎麼共用設定與成果"},
+     {code:"I", label:"搞懂分享連結與檔案的安全差別，避免內部資料外流"}
+   ]}
+];
+
+/* 課堂實作：四題合併成一頁（同一個案例的四個面向） */
+const TASK_BLOCK = {
+  id:"task", part:"p5",
+  title:"描述一個你想在課堂上完成的真實任務",
+  hint:"工作坊會直接用你的任務帶你做完，寫得越具體，課堂收穫越大",
+  fields:[
+    {key:"task", label:"這個任務是什麼", ph:"例：每週一要發四間館的 IG 文案，共 8 則", required:true, textarea:true},
+    {key:"now",  label:"現在怎麼做、多久做一次", ph:"例：每次自己想文案，大約花兩小時", textarea:true}
+  ],
+  q16:{key:"succ", label:"這個案例完成到什麼程度算成功？",
+    options:["產出可用的初稿","建好之後可以重複用的模板","明顯縮短整理時間","數字不再出錯","產出可以直接分享的檔案"]},
+  q17:{key:"mat", label:"現場能帶什麼素材？", multi:true,
+    note:"「去識別」＝把認得出特定客人或機密的內容改掉：姓名改成「客人 A」、刪電話與 email、真實營收改成等比例假數字",
+    options:["去識別後的 Excel／CSV","去識別後的文件（Word、PDF）","圖片或截圖","只有文字描述就夠","還沒準備好"]},
+  q18:{key:"limit", label:"資料有沒有使用限制？",
+    options:["我可以自己先把資料去識別再帶來","真實資料完全不能用，請幫我準備虛構範例","不確定怎麼判斷，想請講師協助改寫"]}
 };
 
-/* Q13/Q16/Q17/Q18 選項文字 → 匿名統計代號（與 worker validate() 的範圍一致） */
-const SUCC_CODES = {"產出可用的初稿":1,"建好之後可以重複用的模板":2,"明顯縮短整理時間":3,"數字不再出錯":4,"產出可以直接分享的檔案":5};
-const MAT_CODES  = {"去識別後的 Excel／CSV":1,"去識別後的文件（Word、PDF）":2,"圖片或截圖":3,"只有文字描述就夠":4,"還沒準備好":5};
-const LIMIT_CODES= {"我可以自己先把資料去識別再帶來":1,"真實資料完全不能用，請幫我準備虛構範例":2,"不確定怎麼判斷，想請講師協助改寫":3};
-const LIT_CODES  = {"分得清楚，兩種都用過":1,"聽過但不確定差別在哪":2,"第一次聽到這兩個詞":3};
-const SUCC_LABELS = ["（未填）","產出可用的初稿","可重複用的模板","縮短整理時間","數字不再出錯","可直接分享的檔案"];
-const MAT_LABELS  = ["","去識別 Excel／CSV","去識別文件","圖片或截圖","只有文字描述","還沒準備好"];
-const LIMIT_LABELS= ["","自備去識別資料","需要虛構範例","需要講師協助"];
-const LIT_LABELS  = ["","分得清楚","聽過但不確定","第一次聽到"];
-/* Q11 中視為「敏感暴露」的選項 */
+const DEPTS = ["行銷處","數位處","其他"];
 const SENS_OPTIONS = ["客人個資或訂位資料","內部成本或財務數字","不確定哪些可以貼"];
 
-/* ====== 狀態 ====== */
-let step = 0;                       // 0=基本資料, 1..N=題目, N+1=結果頁
-const TOTAL = QUESTIONS.length;
-const answers = { name:"", dept:"", job:"" };
-QUESTIONS.forEach(q => {
-  if(q.type === "multi") answers[q.id] = [];
-  else if(q.type === "multitext"){ answers[q.id] = {}; q.fields.forEach(f => answers[q.id][f.key] = ""); }
-  else answers[q.id] = "";
-});
-const otherTexts = {};              // 各題「其他」選項的自填內容
+/* 診斷規則：由作答推導建議單元 */
+function buildDiagnosis(a){
+  const diag = new Set();
+  if(a.q1 === "還沒用過") diag.add("A");
+  if((a.q2||[]).includes("不確定自己用的是哪種")) diag.add("B");
+  if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
+  if((a.q10||[]).includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
+  if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定"){ diag.add("C"); diag.add("D"); }
+  if(a.task && a.task.task) diag.add("D");
+  if(a.task && a.task.succ === "建好之後可以重複用的模板") diag.add("D");
+  if(a.q7 === "整份檔案直接上傳") diag.add("E");
+  if((a.q8||[]).some(o => o==="掃描檔或紙本拍照" || o==="手機截圖")) diag.add("E");
+  if((a.q10||[]).some(o => o==="數字加總或計算結果出錯" || o==="讀取掃描檔或圖片時認錯字")) diag.add("E");
+  if((a.q3||[]).includes("報表或 Excel")) diag.add("E");
+  if(a.task && a.task.succ === "數字不再出錯") diag.add("E");
+  if((a.q3||[]).includes("社群文案")) diag.add("F");
+  if(a.task && a.task.succ === "產出可用的初稿") diag.add("F");
+  if((a.q3||[]).some(o => o==="簡報" || o==="互動式工具或圖表")) diag.add("G");
+  if(a.q13 === "第一次聽到這兩個詞") diag.add("G");
+  if(a.task && a.task.succ === "產出可以直接分享的檔案") diag.add("G");
+  if(SENS_OPTIONS.some(o => (a.q11||[]).includes(o))) diag.add("I");
+  if(a.q12 === "傳 Artifacts 分享連結") diag.add("I");
+  if(a.q13 === "聽過但不確定差別在哪" || a.q13 === "第一次聽到這兩個詞") diag.add("I");
+  return [...diag].sort();
+}
 
-/* 課程通行碼:線上版進站即須通過 Worker 驗證;不進入回覆文字,僅存當前分頁 */
+/* ===== 模擬統計資料（原型示意，正式版由 Worker API 提供） ===== */
+const MOCK_RESPONSES = [
+  {dept:"行銷處", topics:["F","G","D"], diag:["C","D","F","I"], task:"每週一要發四間館的 IG 文案，共 8 則", succ:2, mat:[4], limit:1, sens:1, lit:2},
+  {dept:"行銷處", topics:["F","E","I"], diag:["E","F","I"],     task:"月底活動成效報表，從各館 Excel 彙整", succ:3, mat:[1], limit:1, sens:1, lit:2},
+  {dept:"行銷處", topics:["F","G"],     diag:["C","F","G"],     task:"母親節檔期文案一次出 FB＋IG＋LINE 三版", succ:1, mat:[4], limit:1, sens:0, lit:3},
+  {dept:"行銷處", topics:["D","F","H"], diag:["C","D","F"],     task:"品牌調性設定一次，之後文案不用重新解釋", succ:2, mat:[2], limit:1, sens:0, lit:2},
+  {dept:"行銷處", topics:["E","G","I"], diag:["E","G","I"],     task:"媒體投放週報自動整理成簡報", succ:5, mat:[1], limit:3, sens:1, lit:1},
+  {dept:"數位處", topics:["E","D","C"], diag:["C","D","E"],     task:"訂房資料清整：每天三個系統的報表合併", succ:4, mat:[1], limit:2, sens:1, lit:1},
+  {dept:"數位處", topics:["E","G"],     diag:["E","G"],         task:"營收 dashboard 的數據驗證流程", succ:4, mat:[1], limit:1, sens:1, lit:1},
+  {dept:"數位處", topics:["H","D","I"], diag:["D","I"],         task:"跨部門共用的 FAQ 知識庫建置", succ:2, mat:[2], limit:1, sens:0, lit:2},
+  {dept:"數位處", topics:["C","B"],     diag:["B","C"],         task:"搞懂什麼任務該用 Code、什麼用 Chat", succ:3, mat:[4], limit:1, sens:0, lit:2},
+  {dept:"其他",   topics:["A","B","C"], diag:["A","B","C"],     task:"還沒用過，想先建立帳號跟基本流程", succ:1, mat:[5], limit:3, sens:0, lit:3},
+  {dept:"其他",   topics:["E","I"],     diag:["E","I"],         task:"每月成本結算表的彙整與檢查", succ:4, mat:[1], limit:2, sens:1, lit:2},
+  {dept:"其他",   topics:["G","D"],     diag:["D","G"],         task:"部門 SOP 文件改版成可重複套用的模板", succ:2, mat:[2], limit:1, sens:0, lit:3},
+  {dept:"行銷處", topics:["F","I","G"], diag:["F","G","I"],     task:"活動企劃書初稿：從 brief 直接長出大綱", succ:1, mat:[4], limit:1, sens:0, lit:2},
+  {dept:"數位處", topics:["E","C","D"], diag:["C","E"],         task:"客服對話紀錄分類與週報摘要", succ:3, mat:[1], limit:2, sens:1, lit:1}
+];
+
+const SUCC_LABELS  = ["","產出可用的初稿","可重複用的模板","縮短整理時間","數字不再出錯","可直接分享的檔案"];
+const MAT_LABELS   = ["","去識別 Excel／CSV","去識別文件","圖片或截圖","只有文字描述","還沒準備好"];
+const LIMIT_LABELS = ["","自備去識別資料","需要虛構範例","需要講師協助"];
+const LIT_LABELS   = ["","分得清楚","聽過但不確定差別","第一次聽到"];
+
+/* 彙整 */
+function aggregate(list){
+  const g = { n:list.length, deptCount:{}, topicSel:{}, topicDiag:{}, deptTopic:{},
+    litCount:[0,0,0,0], sensCount:0, matCount:[0,0,0,0,0,0], limitCount:[0,0,0,0],
+    succCount:[0,0,0,0,0,0], tasks:[] };
+  list.forEach(d => {
+    const dept = d.dept || "其他";
+    g.deptCount[dept] = (g.deptCount[dept]||0)+1;
+    g.deptTopic[dept] = g.deptTopic[dept] || {};
+    (d.topics||[]).forEach(c => {
+      g.topicSel[c]=(g.topicSel[c]||0)+1;
+      const t = g.deptTopic[dept][c] = g.deptTopic[dept][c] || {sel:0,diag:0}; t.sel++;
+    });
+    (d.diag||[]).forEach(c => {
+      g.topicDiag[c]=(g.topicDiag[c]||0)+1;
+      const t = g.deptTopic[dept][c] = g.deptTopic[dept][c] || {sel:0,diag:0}; t.diag++;
+    });
+    if(d.lit>=1 && d.lit<=3) g.litCount[d.lit]++;
+    if(d.sens===1) g.sensCount++;
+    (d.mat||[]).forEach(m => { if(m>=1&&m<=5) g.matCount[m]++; });
+    if(d.limit>=1 && d.limit<=3) g.limitCount[d.limit]++;
+    if(d.succ>=1 && d.succ<=5) g.succCount[d.succ]++;
+    if(d.task) g.tasks.push({dept, task:d.task});
+  });
+  return g;
+}
+
+/* 示範用預填答案（總覽頁直接跳到後段畫面時使用） */
+const DEMO_ANSWERS = {
+  name:"林佳穎", dept:"行銷處", job:"負責兩間館的社群與活動文案",
+  q1:"每天一次", q2:["Chat 網頁版","手機 App"], q3:["社群文案","簡報","報表或 Excel"],
+  q4:["社群文案"], q5:"一個對話從頭用到尾，什麼事都在裡面問", q6:"每次對話開頭重新貼一次",
+  q7:"整份檔案直接上傳", q8:["Excel 或 CSV","手機截圖"], q9:"來回叫它改好幾次直到滿意",
+  q10:["用到一半被告知額度用完、要等冷卻","產出的格式每次都不一樣"],
+  q11:["未公開的活動或企劃內容","不確定哪些可以貼"], q12:"截圖貼群組", q13:"聽過但不確定差別在哪",
+  q14:["F","D","I"],
+  task:{ task:"每週一要發四間館的 IG 文案，共 8 則", now:"每次自己想文案，大約花兩小時",
+         succ:"建好之後可以重複用的模板", mat:["只有文字描述就夠"], limit:"我可以自己先把資料去識別再帶來" }
+};
+
+Object.assign(window, { CATEGORY_NAMES, PARTS, QUESTIONS, TASK_BLOCK, DEPTS, SENS_OPTIONS,
+  buildDiagnosis, MOCK_RESPONSES, SUCC_LABELS, MAT_LABELS, LIMIT_LABELS, LIT_LABELS,
+  aggregate, DEMO_ANSWERS });
+
+
+/* ============================================================
+   課前調查 app.js（vanilla，無框架）
+   - 線上：Cloudflare Worker 驗證通行碼 + 匿名統計（與舊版 API 相容）
+   - ?demo=1 或 file: 開啟：跳過驗證、統計用 MOCK_RESPONSES 模擬
+   ============================================================ */
+
+const API_BASE = "https://workshop-survey-api.ciracloser.workers.dev";
+const DEMO = new URLSearchParams(location.search).has("demo") || location.protocol === "file:";
+const AUTO_ADVANCE = true;          // 單選後自動前進
+const OTHER = "其他";
+
+/* 選項文字 → 統計代號（與 data.js 的 *_LABELS 對齊） */
+const SUCC_CODE  = Object.fromEntries(TASK_BLOCK.q16.options.map((o,i) => [o, i+1]));
+const MAT_CODE   = Object.fromEntries(TASK_BLOCK.q17.options.map((o,i) => [o, i+1]));
+const LIMIT_CODE = Object.fromEntries(TASK_BLOCK.q18.options.map((o,i) => [o, i+1]));
+const LIT_CODE   = Object.fromEntries(QUESTIONS.find(q => q.id === "q13").options.map((o,i) => [o, i+1]));
+
+/* ===== 步驟表 ===== */
+const STEPS = (() => {
+  const s = [{kind:"welcome"}, {kind:"profile"}];
+  PARTS.forEach(p => {
+    p.qs.forEach(qid => s.push(qid === "task"
+      ? {kind:"task", part:p}
+      : {kind:"question", part:p, q:QUESTIONS.find(q => q.id === qid)}));
+  });
+  s.push({kind:"done"});
+  return s;
+})();
+const Q_TOTAL = STEPS.filter(s => s.kind === "question" || s.kind === "task").length;
+function qNumberAt(i){
+  let n = 0;
+  for(let k = 0; k <= i; k++) if(STEPS[k].kind === "question" || STEPS[k].kind === "task") n++;
+  return n;
+}
+
+/* ===== 狀態 ===== */
+let stepIdx = 0, dirn = 1, sectionTimer = null;
+const answers = (() => {
+  const a = { name:"", dept:"", job:"" };
+  QUESTIONS.forEach(q => { a[q.id] = (q.type === "multi" || q.type === "topics") ? [] : ""; });
+  a.task = { task:"", now:"", succ:"", mat:[], limit:"" };
+  return a;
+})();
+const otherTexts = {};
 let classCode = "";
 try{ classCode = sessionStorage.getItem("classCode") || ""; }catch(e){}
-let gateOk = location.protocol === "file:";   // 離線 HTML 檔無統計功能,不設門禁
+let gateOk = DEMO;
 
+const $app = document.getElementById("app");
 const $screen = document.getElementById("screen");
 
-/* ====== 畫面渲染 ====== */
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ===== 導覽 ===== */
+function go(i, d){
+  clearTimeout(sectionTimer);
+  dirn = d; stepIdx = Math.max(0, Math.min(i, STEPS.length - 1));
+  render();
+}
+function next(){ go(stepIdx + 1, 1); }
+function back(){
+  let i = stepIdx - 1;
+  while(i > 0 && STEPS[i].kind === "section") i--;   // 回上一步略過過場頁
+  go(i, -1);
+}
+
+/* ===== 渲染 ===== */
 function render(){
-  updateProgress();
-  if(!gateOk) renderGate();
-  else if(step === 0) renderIntro();
-  else if(step >= 1 && step <= TOTAL) renderQuestion(QUESTIONS[step-1]);
-  else renderDone();
-  window.scrollTo({top:0});
+  const step = STEPS[stepIdx];
+  $app.dataset.kind = step.kind;
+  renderSidebar(step);
+  const wrap = document.createElement("div");
+  wrap.className = "sv-step " + (dirn >= 0 ? "from-right" : "from-left");
+  wrap.innerHTML = ({
+    welcome: htmlWelcome, profile: htmlProfile, section: htmlSection,
+    question: htmlQuestion, task: htmlTask, done: htmlDone
+  })[step.kind](step);
+  $screen.replaceChildren(wrap);
+  ({ welcome: bindWelcome, profile: bindProfile, section: bindSection,
+     question: bindQuestion, task: bindTask, done: bindDone })[step.kind](step);
+  window.scrollTo(0, 0);
 }
 
-function updateProgress(){
-  const fill = document.getElementById("progressFill");
-  const count = document.getElementById("progressCount");
-  const sec = document.getElementById("progressSection");
-  if(!gateOk){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "課程通行碼"; }
-  else if(step === 0){ fill.style.width = "0%"; count.innerHTML = ""; sec.textContent = "基本資料"; }
-  else if(step <= TOTAL){
-    fill.style.width = Math.round(step/ (TOTAL+1) *100) + "%";
-    count.innerHTML = '<span class="p-num">' + String(step).padStart(2,"0") + '</span><span class="p-total">／' + TOTAL + '</span>';
-    sec.textContent = QUESTIONS[step-1].section;
-  } else { fill.style.width = "100%"; count.innerHTML = ""; sec.textContent = "完成"; }
+function renderSidebar(step){
+  const partIdx = step.part ? PARTS.findIndex(p => p.id === step.part.id)
+                : (step.kind === "done" ? PARTS.length : -1);
+  document.getElementById("checklist").innerHTML = PARTS.map((p, i) => {
+    const status = step.kind === "done" ? "done" : (i < partIdx ? "done" : i === partIdx ? "current" : "todo");
+    const count = p.qs.length === 1 && p.qs[0] === "task" ? "1 頁" : p.qs.length + " 題";
+    return '<li class="' + status + '"><span class="cl-mark"></span>' +
+      '<span class="cl-title">' + p.title + '</span><span class="cl-count">' + count + '</span></li>';
+  }).join("");
+  const qn = qNumberAt(stepIdx);
+  const $count = document.getElementById("sideCount");
+  if(step.kind === "welcome" || step.kind === "profile") $count.innerHTML = Q_TOTAL + " 題・約 7 分鐘";
+  else if(step.kind === "done") $count.innerHTML = "已完成，感謝填寫";
+  else $count.innerHTML = "<strong>" + String(qn).padStart(2,"0") + "</strong>／" + Q_TOTAL + " 題";
+  document.getElementById("sideBarFill").style.width =
+    (step.kind === "done" ? 100 : Math.round(qn / Q_TOTAL * 100)) + "%";
 }
 
-/* --- 通行碼鎖定頁:進站第一個畫面,通過 Worker 驗證才能看到問卷 --- */
-function renderGate(){
-  $screen.innerHTML = `
-    <h1>輸入課程通行碼</h1>
-    <p class="hint">本問卷僅供工作坊學員填寫。通行碼寫在課程公告裡，輸入後即可開始作答。</p>
-    <div class="field">
-      <label for="gCode">課程通行碼</label>
-      <input type="text" id="gCode" value="${esc(classCode)}" placeholder="輸入邀請碼" autocomplete="off">
-    </div>
-    <p class="error" id="err"></p>
-    <div class="nav">
-      <span></span>
-      <button class="btn btn-primary" id="gateBtn">進入問卷</button>
-    </div>`;
+/* ===== 共用片段 ===== */
+function htmlOptions(q){
+  const v = answers[q.id];
+  const isMulti = q.type === "multi";
+  const opts = q.other ? q.options.concat(OTHER) : q.options;
+  const showOther = q.other && (isMulti ? v.includes(OTHER) : v === OTHER);
+  return '<div class="sv-options" id="opts">' +
+    opts.map(o => {
+      const sel = isMulti ? v.includes(o) : v === o;
+      return '<button type="button" class="sv-opt' + (sel ? " selected" : "") + '" data-val="' + esc(o) + '" aria-pressed="' + sel + '">' +
+        '<span class="sv-mark ' + (isMulti ? "check" : "radio") + (sel ? " on" : "") + '"></span>' +
+        '<span class="sv-opt-text">' + esc(o) + '</span></button>';
+    }).join("") +
+    '<div class="sv-other" id="otherWrap" style="' + (showOther ? "" : "display:none") + '">' +
+      '<input type="text" id="otherInput" placeholder="請補充說明" value="' + esc(otherTexts[q.id] || "") + '"></div>' +
+  '</div>';
+}
+
+function htmlChips(id, options, value, multi){
+  return '<div class="sv-chips" data-chips="' + id + '">' +
+    options.map(o => {
+      const sel = multi ? value.includes(o) : value === o;
+      return '<button type="button" class="sv-chip' + (sel ? " selected" : "") + '" data-val="' + esc(o) + '" aria-pressed="' + sel + '">' + esc(o) + '</button>';
+    }).join("") + '</div>';
+}
+
+function htmlError(){ return '<p class="sv-error" id="err" style="display:none"></p>'; }
+function showErr(msg){
+  const $e = document.getElementById("err");
+  if(!$e) return;
+  $e.textContent = msg; $e.style.display = "block";
+}
+function hideErr(){
+  const $e = document.getElementById("err");
+  if($e) $e.style.display = "none";
+}
+
+/* ===== 歡迎頁（通行碼合併） ===== */
+function htmlWelcome(){
+  return '<div class="sv-welcome">' +
+    '<p class="sv-kicker">CLAUDE 工作坊</p>' +
+    '<h1 class="sv-display">課前調查</h1>' +
+    '<p class="sv-lede">' + Q_TOTAL + ' 題，約 7 分鐘。你的回答會直接決定課程怎麼安排、實作帶你做什麼——沒有對錯，照實填就好。</p>' +
+    '<div class="sv-gate">' +
+      (gateOk
+        ? '<div class="sv-nav"><span></span><button class="sv-btn primary" id="startBtn">開始填寫</button></div>' +
+          (DEMO ? '<p class="sv-demo-note">示範模式：統計為模擬資料</p>' : "")
+        : '<label class="sv-label" for="gCode">課程通行碼<span class="sv-label-note">寫在課程公告裡</span></label>' +
+          '<div class="sv-gate-row">' +
+            '<input type="text" id="gCode" autocomplete="off" value="' + esc(classCode) + '">' +
+            '<button class="sv-btn primary" id="startBtn">開始填寫</button>' +
+          '</div><p class="sv-error" id="err" style="display:none"></p>') +
+    '</div></div>';
+}
+function bindWelcome(){
+  const $btn = document.getElementById("startBtn");
   const $input = document.getElementById("gCode");
-  const $btn = document.getElementById("gateBtn");
-  const $err = document.getElementById("err");
-  function showErr(msg){ $err.textContent = msg; $err.style.display = "block"; }
-  async function verify(){
+  async function start(){
+    if(gateOk){ next(); return; }
     const code = $input.value.trim();
-    if(!code){ showErr("請輸入通行碼。"); $input.focus(); return; }
-    $btn.disabled = true; $btn.textContent = "確認中…"; $err.style.display = "none";
+    if(!code){ showErr("請輸入課程公告裡的通行碼"); $input.focus(); return; }
+    $btn.disabled = true; $btn.textContent = "驗證中…"; hideErr();
     try{
       const r = await fetch(API_BASE + "/api/verify", { headers: {"X-Class-Code": code} });
       if(r.ok){
         classCode = code;
         try{ sessionStorage.setItem("classCode", code); }catch(e){}
-        console.log("[survey] class-code verified");
-        gateOk = true; render(); return;
+        gateOk = true; next(); return;
       }
-      showErr(r.status === 403 ? "通行碼不正確，請確認課程公告。" : "驗證服務暫時無法使用，請稍後再試。");
+      showErr(r.status === 403 ? "通行碼不正確，請確認課程公告" : "驗證服務暫時無法使用，請稍後再試");
     }catch(e){
-      console.log("[survey] class-code verification failed", e);
-      showErr("連線失敗，請確認網路後再試。");
+      showErr("連線失敗，請確認網路後再試");
     }
-    $btn.disabled = false; $btn.textContent = "進入問卷";
+    $btn.disabled = false; $btn.textContent = "開始填寫";
     $input.focus();
   }
-  $btn.addEventListener("click", verify);
-  $input.addEventListener("keydown", e => { if(e.key === "Enter") verify(); });
-  /* 同分頁內重新整理:已存的通行碼自動驗證,通過就直接進入 */
-  if(classCode) verify(); else $input.focus();
+  $btn.addEventListener("click", start);
+  if($input){
+    $input.addEventListener("keydown", e => { if(e.key === "Enter") start(); });
+    $input.focus();
+  }
 }
 
-/* --- 基本資料頁 --- */
-const DEPTS = ["行銷處","數位處","其他"];
-
-function renderIntro(){
-  $screen.innerHTML = `
-    <h1>開始之前，先認識你一下</h1>
-    <p class="hint">共 ${TOTAL} 題，約 7 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
-    <div class="field">
-      <label for="fName">姓名</label>
-      <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
-    </div>
-    <div class="field">
-      <label>所屬部門</label>
-      <div class="options" id="deptOpts" style="margin-bottom:0">
-        ${DEPTS.map(d=>`<button type="button" class="opt ${answers.dept===d?"selected":""}" data-val="${esc(d)}">${d}</button>`).join("")}
-      </div>
-    </div>
-    <div class="field">
-      <label for="fJob">主要工作內容（一句話即可）</label>
-      <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
-    </div>
-    <p class="error" id="err">請填寫姓名並選擇所屬部門。</p>
-    <div class="nav">
-      <span></span>
-      <button class="btn btn-primary" id="nextBtn">開始作答</button>
-    </div>`;
-  document.querySelectorAll("#deptOpts .opt").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      answers.dept = b.dataset.val;
-      document.querySelectorAll("#deptOpts .opt").forEach(x=>x.classList.remove("selected"));
-      b.classList.add("selected");
-      document.getElementById("err").style.display = "none";
-    });
-  });
-  document.getElementById("nextBtn").addEventListener("click", ()=>{
+/* ===== 基本資料 ===== */
+function htmlProfile(){
+  return '<div>' +
+    '<h2 class="sv-title">先認識你一下</h2>' +
+    '<div class="sv-fields">' +
+      '<div class="sv-field"><label class="sv-label" for="fName">姓名</label>' +
+        '<input type="text" id="fName" autocomplete="name" value="' + esc(answers.name) + '"></div>' +
+      '<div class="sv-field"><span class="sv-label">所屬部門</span>' + htmlChips("dept", DEPTS, answers.dept, false) + '</div>' +
+      '<div class="sv-field"><label class="sv-label" for="fJob">主要工作內容<span class="sv-label-note">一句話即可</span></label>' +
+        '<input type="text" id="fJob" placeholder="例：負責兩間館的社群與活動文案" value="' + esc(answers.job) + '"></div>' +
+    '</div>' + htmlError() +
+    '<div class="sv-nav"><span></span><button class="sv-btn primary" id="nextBtn">開始作答</button></div></div>';
+}
+function bindProfile(){
+  bindChips("dept", v => { answers.dept = v; hideErr(); });
+  function goNext(){
     answers.name = document.getElementById("fName").value.trim();
     answers.job  = document.getElementById("fJob").value.trim();
-    if(!answers.name || !answers.dept){
-      document.getElementById("err").style.display = "block"; return;
-    }
-    step = 1; render();
-  });
+    if(!answers.name || !answers.dept){ showErr("請填寫姓名並選擇所屬部門"); return; }
+    next();
+  }
+  document.getElementById("nextBtn").addEventListener("click", goNext);
+  document.getElementById("fJob").addEventListener("keydown", e => { if(e.key === "Enter") goNext(); });
 }
-
-/* --- 題目頁 --- */
-const OTHER = "其他";
-
-/* 判斷該題目前是否選了「其他」 */
-function isOtherSelected(q){
-  return q.type === "multi" ? answers[q.id].includes(OTHER) : answers[q.id] === OTHER;
-}
-
-function renderQuestion(q){
-  let body = "";
-  if(q.type === "text"){
-    body = `<textarea id="fText" placeholder="${esc(q.placeholder||"")}">${esc(answers[q.id])}</textarea>`;
-  } else if(q.type === "multitext"){
-    body = q.fields.map(f => `
-      <div class="field">
-        <label for="mt_${f.key}">${f.label}</label>
-        <textarea id="mt_${f.key}" placeholder="${esc(f.ph||"")}" style="min-height:64px">${esc(answers[q.id][f.key])}</textarea>
-      </div>`).join("");
-  } else {
-    const opts = q.other ? q.options.concat(OTHER) : q.options;
-    body = `<div class="options" id="opts">
-      ${opts.map(o=>{
-        const sel = q.type==="multi" ? answers[q.id].includes(o) : answers[q.id]===o;
-        return `<button type="button" class="opt ${sel?"selected":""}" data-val="${esc(o)}">${o}</button>`;
-      }).join("")}
-      ${q.other?`<div class="other-wrap ${isOtherSelected(q)?"show":""}" id="otherWrap">
-        <label for="otherInput">請說明</label>
-        <input type="text" id="otherInput" value="${esc(otherTexts[q.id]||"")}" placeholder="自由填寫">
-      </div>`:""}
-    </div>`;
-  }
-  /* 進度列已顯示題號,畫面標題去掉「Qn.」前綴;摘要文字仍保留完整題號 */
-  $screen.innerHTML = `
-    <h2>${q.title.replace(/^Q\d+\.\s*/, "")}</h2>
-    ${q.hint?`<p class="hint">${q.hint}</p>`:`<div style="height:10px"></div>`}
-    ${body}
-    <p class="error" id="err">請至少選擇一個選項。</p>
-    <div class="nav">
-      <button class="btn btn-ghost" id="backBtn">上一步</button>
-      <button class="btn btn-primary" id="nextBtn">${step===TOTAL?"完成":"下一題"}</button>
-    </div>`;
-
-  const $otherWrap  = document.getElementById("otherWrap");
-  const $otherInput = document.getElementById("otherInput");
-  const $err = document.getElementById("err");
-
-  /* 儲存「其他」說明文字 */
-  function saveOther(){
-    if($otherInput) otherTexts[q.id] = $otherInput.value.trim();
-  }
-  /* 儲存多欄位填寫題 */
-  function saveMultitext(){
-    if(q.type !== "multitext") return;
-    q.fields.forEach(f => answers[q.id][f.key] = document.getElementById("mt_"+f.key).value.trim());
-  }
-  function showErr(msg){ $err.textContent = msg; $err.style.display = "block"; }
-
-  if(q.type === "single"){
-    document.querySelectorAll("#opts .opt").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        answers[q.id] = b.dataset.val;
-        document.querySelectorAll("#opts .opt").forEach(x=>x.classList.remove("selected"));
-        b.classList.add("selected");
-        if(b.dataset.val === OTHER && $otherWrap){
-          /* 選「其他」時不自動前進,展開輸入欄等待填寫 */
-          $otherWrap.classList.add("show");
-          $otherInput.focus();
-        } else {
-          if($otherWrap) $otherWrap.classList.remove("show");
-          setTimeout(()=>{ step++; render(); }, 220);   // 單選後自動前進
-        }
-      });
-    });
-  } else if(q.type === "multi"){
-    document.querySelectorAll("#opts .opt").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const v = b.dataset.val;
-        const arr = answers[q.id];
-        const i = arr.indexOf(v);
-        if(i >= 0){ arr.splice(i,1); }
-        else {
-          /* 有選擇上限的題目(如最多三個)到達上限時擋下並提示 */
-          if(q.max && arr.length >= q.max){ showErr("這題最多選 " + q.max + " 個，請先取消一個再選。"); return; }
-          arr.push(v);
-        }
-        $err.style.display = "none";
+function bindChips(id, onPick, multi, getValue){
+  document.querySelectorAll('[data-chips="' + id + '"] .sv-chip').forEach(b => {
+    b.addEventListener("click", () => {
+      if(multi){
+        const arr = getValue();
+        const i = arr.indexOf(b.dataset.val);
+        if(i >= 0) arr.splice(i, 1); else arr.push(b.dataset.val);
         b.classList.toggle("selected");
-        /* 互斥選項（如 Q4「都還沒用 Claude 做」）：選它清空其餘，選其餘取消它 */
-        if(q.exclusive && arr.includes(v)){
-          if(v === q.exclusive){
-            arr.length = 0; arr.push(q.exclusive);
-          } else {
-            const ex = arr.indexOf(q.exclusive);
-            if(ex >= 0) arr.splice(ex, 1);
-          }
-          document.querySelectorAll("#opts .opt").forEach(x =>
-            x.classList.toggle("selected", arr.includes(x.dataset.val)));
-        }
-        if(v === OTHER && $otherWrap){
-          $otherWrap.classList.toggle("show", arr.includes(OTHER));
-          if(arr.includes(OTHER)) $otherInput.focus();
-        }
-      });
+        onPick(arr);
+      } else {
+        document.querySelectorAll('[data-chips="' + id + '"] .sv-chip').forEach(x => x.classList.remove("selected"));
+        b.classList.add("selected");
+        onPick(b.dataset.val);
+      }
     });
-  }
-  document.getElementById("backBtn").addEventListener("click", ()=>{
-    if(q.type === "text") answers[q.id] = document.getElementById("fText").value.trim();
-    saveMultitext(); saveOther();
-    step--; render();
   });
-  document.getElementById("nextBtn").addEventListener("click", ()=>{
-    if(q.type === "text"){
-      answers[q.id] = document.getElementById("fText").value.trim();
-    } else if(q.type === "multitext"){
-      saveMultitext();
-      const req = q.fields.find(f => f.required && !answers[q.id][f.key]);
-      if(req){ showErr("「" + req.label + "」是必填，請至少寫一句。"); return; }
-    } else if(q.type === "single" && !answers[q.id]){
-      showErr("請至少選擇一個選項。"); return;
-    } else if(q.type === "multi" && answers[q.id].length === 0){
-      showErr("請至少選擇一個選項。"); return;
-    }
-    saveOther();
-    /* 選了「其他」但沒填說明:提示補填 */
-    if(q.other && isOtherSelected(q) && !otherTexts[q.id]){
-      showErr("你選了「其他」，請在欄位中填寫說明。");
-      if($otherInput) $otherInput.focus();
+}
+
+/* ===== 部分過場頁 ===== */
+function htmlSection(step){
+  const p = step.part;
+  const i = PARTS.findIndex(x => x.id === p.id);
+  return '<button type="button" class="sv-section" id="secBtn">' +
+    '<span class="sv-section-num">' + p.num + '</span>' +
+    '<span class="sv-section-meta">第' + p.num + '部分・' + (i+1) + '／' + PARTS.length + '</span>' +
+    '<span class="sv-section-title sv-display">' + p.title + '</span>' +
+    '<span class="sv-section-blurb">' + p.blurb + '</span>' +
+    '<span class="sv-section-skip">點一下繼續</span></button>';
+}
+function bindSection(){
+  document.getElementById("secBtn").addEventListener("click", next);
+  sectionTimer = setTimeout(next, 1800);
+}
+
+/* ===== 題目頁 ===== */
+function htmlQuestion(step){
+  const q = step.q;
+  const qn = qNumberAt(stepIdx);
+  const body = q.type === "topics" ? htmlTopics(q) : htmlOptions(q);
+  return '<div><h2 class="sv-title">' + esc(q.title) + '</h2>' +
+    (q.hint ? '<p class="sv-hint">' + esc(q.hint) + '</p>' : "") +
+    body + htmlError() +
+    '<div class="sv-nav"><button class="sv-btn ghost" id="backBtn">上一步</button>' +
+    '<button class="sv-btn primary" id="nextBtn">' + (qn === Q_TOTAL ? "完成" : "下一題") + '</button></div></div>';
+}
+function htmlTopics(q){
+  const v = answers[q.id];
+  return '<div class="sv-topic-count">已選 <strong id="topicCount">' + v.length + '</strong>／' + q.max + '</div>' +
+    '<div class="sv-topic-grid" id="topicGrid">' +
+    q.options.map(o => {
+      const sel = v.includes(o.code);
+      return '<button type="button" class="sv-topic' + (sel ? " selected" : "") + '" data-code="' + o.code + '" aria-pressed="' + sel + '">' +
+        '<span class="sv-topic-code">' + o.code + '</span>' +
+        '<span class="sv-topic-label">' + esc(o.label) + '</span>' +
+        '<span class="sv-mark check on"></span></button>';
+    }).join("") + '</div>';
+}
+function bindQuestion(step){
+  const q = step.q;
+  document.getElementById("backBtn").addEventListener("click", () => { saveOther(q); back(); });
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    saveOther(q);
+    const v = answers[q.id];
+    if(q.type === "single" && !v) return showErr("請選擇一個選項");
+    if((q.type === "multi" || q.type === "topics") && v.length === 0) return showErr("請至少選擇一個選項");
+    const hasOther = q.type === "single" ? v === OTHER : Array.isArray(v) && v.includes(OTHER);
+    if(q.other && hasOther && !(otherTexts[q.id]||"").trim()){
+      showErr("你選了「其他」，請補充說明");
+      const $o = document.getElementById("otherInput"); if($o) $o.focus();
       return;
     }
-    step++; render();
+    next();
+  });
+  if(q.type === "topics"){
+    document.querySelectorAll("#topicGrid .sv-topic").forEach(b => {
+      b.addEventListener("click", () => {
+        const code = b.dataset.code, arr = answers[q.id];
+        const i = arr.indexOf(code);
+        if(i >= 0){ arr.splice(i,1); b.classList.remove("selected"); }
+        else if(arr.length >= q.max){ showErr("最多選 " + q.max + " 個，先取消一個再選"); return; }
+        else { arr.push(code); b.classList.add("selected"); }
+        hideErr();
+        document.getElementById("topicCount").textContent = arr.length;
+      });
+    });
+    return;
+  }
+  const $otherWrap = document.getElementById("otherWrap");
+  const $otherInput = document.getElementById("otherInput");
+  if($otherInput){
+    $otherInput.addEventListener("input", () => { otherTexts[q.id] = $otherInput.value.trim(); hideErr(); });
+    $otherInput.addEventListener("keydown", e => { if(e.key === "Enter") document.getElementById("nextBtn").click(); });
+  }
+  document.querySelectorAll("#opts .sv-opt").forEach(b => {
+    b.addEventListener("click", () => {
+      const o = b.dataset.val;
+      hideErr();
+      if(q.type === "multi"){
+        let arr = answers[q.id];
+        if(arr.includes(o)) arr.splice(arr.indexOf(o), 1); else arr.push(o);
+        if(q.exclusive){
+          if(o === q.exclusive && arr.includes(o)){ arr.length = 0; arr.push(q.exclusive); }
+          else { const x = arr.indexOf(q.exclusive); if(x >= 0) arr.splice(x, 1); }
+        }
+        document.querySelectorAll("#opts .sv-opt").forEach(x => {
+          const sel = arr.includes(x.dataset.val);
+          x.classList.toggle("selected", sel);
+          x.querySelector(".sv-mark").classList.toggle("on", sel);
+        });
+        $otherWrap.style.display = arr.includes(OTHER) ? "" : "none";
+        if(o === OTHER && arr.includes(OTHER)) $otherInput.focus();
+      } else {
+        answers[q.id] = o;
+        document.querySelectorAll("#opts .sv-opt").forEach(x => {
+          const sel = x.dataset.val === o;
+          x.classList.toggle("selected", sel);
+          x.querySelector(".sv-mark").classList.toggle("on", sel);
+        });
+        if(o === OTHER){ $otherWrap.style.display = ""; $otherInput.focus(); }
+        else {
+          $otherWrap.style.display = "none";
+          if(AUTO_ADVANCE) sectionTimer = setTimeout(next, 340);
+        }
+      }
+    });
+  });
+  function saveOther(qq){
+    const $o = document.getElementById("otherInput");
+    if($o) otherTexts[qq.id] = $o.value.trim();
+  }
+}
+function saveOther(){} /* 佔位：實際邏輯在 bindQuestion 閉包內 */
+
+/* ===== 課堂實作（整頁） ===== */
+function htmlTask(){
+  const t = answers.task, B = TASK_BLOCK;
+  return '<div class="sv-task"><h2 class="sv-title">' + esc(B.title) + '</h2>' +
+    '<p class="sv-hint">' + esc(B.hint) + '</p>' +
+    '<div class="sv-fields">' +
+      B.fields.map(f =>
+        '<div class="sv-field"><label class="sv-label" for="tf_' + f.key + '">' + esc(f.label) +
+        (f.required ? '<em class="sv-req">必填</em>' : "") + '</label>' +
+        '<textarea id="tf_' + f.key + '" placeholder="' + esc(f.ph || "") + '">' + esc(t[f.key]) + '</textarea></div>'
+      ).join("") +
+    '</div>' +
+    '<div class="sv-subq"><span class="sv-label">' + esc(B.q16.label) + '</span>' + htmlChips("succ", B.q16.options, t.succ, false) + '</div>' +
+    '<div class="sv-subq"><span class="sv-label">' + esc(B.q17.label) +
+      '<button type="button" class="sv-note-toggle" id="noteBtn">什麼是「去識別」？</button></span>' +
+      '<p class="sv-note" id="noteBox" style="display:none">' + esc(B.q17.note) + '</p>' +
+      htmlChips("mat", B.q17.options, t.mat, true) + '</div>' +
+    '<div class="sv-subq"><span class="sv-label">' + esc(B.q18.label) + '</span>' + htmlChips("limit", B.q18.options, t.limit, false) + '</div>' +
+    htmlError() +
+    '<div class="sv-nav"><button class="sv-btn ghost" id="backBtn">上一步</button>' +
+    '<button class="sv-btn primary" id="nextBtn">送出問卷</button></div></div>';
+}
+function bindTask(){
+  const t = answers.task;
+  bindChips("succ", v => { t.succ = v; });
+  bindChips("limit", v => { t.limit = v; });
+  bindChips("mat", () => {}, true, () => t.mat);
+  document.getElementById("noteBtn").addEventListener("click", () => {
+    const $n = document.getElementById("noteBox");
+    $n.style.display = $n.style.display === "none" ? "" : "none";
+  });
+  function save(){
+    TASK_BLOCK.fields.forEach(f => { t[f.key] = document.getElementById("tf_" + f.key).value.trim(); });
+  }
+  document.getElementById("backBtn").addEventListener("click", () => { save(); back(); });
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    save();
+    if(!t.task){ showErr("「這個任務是什麼」是必填，至少寫一句"); return; }
+    next();
   });
 }
 
-/* --- 教材分類自動標籤（規則表見 docs/specs/2026-06-11-survey-question-revision-design.md） --- */
-function buildCategoryTags(){
-  const diag = new Set();
+/* ===== 完成頁 ===== */
+function buildPayload(){
   const a = answers;
-  if(a.q1 === "還沒用過") diag.add("A");
-  if(a.q2.includes("不確定自己用的是哪種")) diag.add("B");
-  if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
-  if(a.q10.includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
-  if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定") diag.add("C").add("D");
-  if(a.q15.task) diag.add("D");                                  // 有固定實作任務，需要 Project
-  if(a.q16 === "建好之後可以重複用的模板") diag.add("D");
-  if(a.q7 === "整份檔案直接上傳") diag.add("E");
-  if(a.q8.includes("掃描檔或紙本拍照") || a.q8.includes("手機截圖")) diag.add("E");
-  if(a.q10.includes("數字加總或計算結果出錯") || a.q10.includes("讀取掃描檔或圖片時認錯字")) diag.add("E");
-  if(a.q3.includes("報表或 Excel")) diag.add("E");
-  if(a.q16 === "數字不再出錯") diag.add("E");
-  if(a.q3.includes("社群文案")) diag.add("F");
-  if(a.q16 === "產出可用的初稿") diag.add("F");
-  if(a.q3.includes("簡報") || a.q3.includes("互動式工具或圖表")) diag.add("G");
-  if(a.q13 === "第一次聽到這兩個詞") diag.add("G");
-  if(a.q16 === "產出可以直接分享的檔案") diag.add("G");
-  if(SENS_OPTIONS.some(o => a.q11.includes(o))) diag.add("I");
-  if(a.q12 === "傳 Artifacts 分享連結") diag.add("I");
-  if(a.q13 === "聽過但不確定差別在哪" || a.q13 === "第一次聽到這兩個詞") diag.add("I");
-  const chosen = a.q14.map(o => TOPIC_MAP[o]).filter(Boolean);
-  const fmt = arr => arr.length ? arr.map(c => c + " " + CATEGORY_NAMES[c]).join("、") : "（無）";
-  const diagArr = [...diag].sort();
-  return { diag: fmt(diagArr), chosen: fmt(chosen), diagRaw: diagArr, chosenRaw: chosen };
+  return {
+    uid: uidFrom(a.name, a.dept),
+    dept: a.dept || "其他",
+    topics: a.q14 || [],
+    diag: buildDiagnosis(a),
+    task: (a.task.task || "").slice(0, 120),
+    succ: SUCC_CODE[a.task.succ] || 0,
+    mat: (a.task.mat || []).map(o => MAT_CODE[o]).filter(Boolean),
+    limit: LIMIT_CODE[a.task.limit] || 0,
+    sens: SENS_OPTIONS.some(o => (a.q11||[]).includes(o)) ? 1 : 0,
+    lit: LIT_CODE[a.q13] || 0,
+    ts: Date.now()
+  };
 }
-
-/* --- 共同統計(由統計 API 提供;直接開離線 HTML 檔時自動略過) --- */
-const API_BASE = "https://workshop-survey-api.ciracloser.workers.dev";
-
-/* 以姓名+部門產生固定代號:同一人重填會覆蓋舊回覆,不會重複計算 */
 function uidFrom(name, dept){
   let h = 0; const str = name + "|" + dept;
   for(let i = 0; i < str.length; i++){ h = (h * 31 + str.charCodeAt(i)) >>> 0; }
   return h.toString(36);
 }
 
-/* 組出匿名化回覆：只含部門、主題、診斷、任務摘要與備課代號，不含姓名與完整作答 */
-function buildPayload(){
-  const tags = buildCategoryTags();
-  return {
-    uid: uidFrom(answers.name, answers.dept),
-    dept: answers.dept,
-    topics: tags.chosenRaw,
-    diag: tags.diagRaw,
-    task: (answers.q15.task || "").slice(0, 120),
-    succ: SUCC_CODES[answers.q16] || 0,
-    mat: answers.q17.map(o => MAT_CODES[o]).filter(Boolean),
-    limit: LIMIT_CODES[answers.q18] || 0,
-    sens: SENS_OPTIONS.some(o => answers.q11.includes(o)) ? 1 : 0,
-    lit: LIT_CODES[answers.q13] || 0,
-    ts: Date.now()
-  };
+function htmlDone(){
+  return '<div class="st-sending"><span class="st-spinner"></span><p>正在送出你的回覆…</p></div>';
 }
-
-async function submitShared(payload){
-  try{
-    const r = await fetch(API_BASE + "/api/response", {
-      method: "POST",
-      headers: {"Content-Type": "application/json", "X-Class-Code": classCode},
-      body: JSON.stringify(payload)
-    });
-    if(!r.ok) throw new Error("submit failed: " + r.status);
-    console.log("[survey] anonymous aggregate submitted");
-  }catch(e){
-    console.log("[survey] anonymous aggregate submit failed", e);
-    throw e;
-  }
-}
-
-/* 讀取所有回覆並彙整;清單更新有短暫延遲,自己剛送出的回覆若還沒出現就先補進統計 */
-async function loadShared($box, mine){
-  try{
-    const r = await fetch(API_BASE + "/api/responses", { headers: {"X-Class-Code": classCode} });
-    if(r.status === 403){
-      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">通行碼已失效，統計無法載入。你的填答摘要仍保留在上方，請重新輸入課程公告內的通行碼。</p><button class="btn btn-ghost" id="codeBackBtn">重新輸入通行碼</button>';
-      document.getElementById("codeBackBtn").addEventListener("click", ()=>{
-        classCode = ""; gateOk = false; render();
-      });
-      return;
-    }
-    if(!r.ok) throw new Error("load failed: " + r.status);
-    let list = await r.json();
-    if(mine && !list.some(d => d.uid === mine.uid)) list = list.concat(mine);
-    if(list.length <= 1){
-      $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你是第一位完成的，等其他同仁填寫後，這裡會出現大家最想學的主題統計。</p>';
-      return;
-    }
-    console.log("[survey] shared stats loaded", {count:list.length});
-    renderStats($box, aggregate(list));
-  }catch(e){
-    console.log("[survey] shared stats load failed", e);
-    $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
-  }
-}
-
-/* 彙整全部匿名回覆;對缺欄位的舊 schema 回覆容錯 */
-function aggregate(list){
-  const g = {
-    n: list.length, deptCount: {}, topicSel: {}, topicDiag: {}, deptTopic: {},
-    litCount: [0,0,0,0], sensCount: 0,
-    matCount: [0,0,0,0,0,0], limitCount: [0,0,0,0], succCount: [0,0,0,0,0,0],
-    tasksByDept: {}
-  };
-  list.forEach(d => {
-    const dept = d.dept || "其他";
-    g.deptCount[dept] = (g.deptCount[dept]||0) + 1;
-    g.deptTopic[dept] = g.deptTopic[dept] || {};
-    const bump = (c, key) => {
-      g[key][c] = (g[key][c]||0) + 1;
-      const t = g.deptTopic[dept][c] = g.deptTopic[dept][c] || {sel:0, diag:0};
-      t[key === "topicSel" ? "sel" : "diag"]++;
-    };
-    (Array.isArray(d.topics) ? d.topics : []).forEach(c => bump(c, "topicSel"));
-    (Array.isArray(d.diag)   ? d.diag   : []).forEach(c => bump(c, "topicDiag"));
-    if(d.lit >= 1 && d.lit <= 3) g.litCount[d.lit]++;
-    if(d.sens === 1) g.sensCount++;
-    (Array.isArray(d.mat) ? d.mat : []).forEach(m => { if(m >= 1 && m <= 5) g.matCount[m]++; });
-    if(d.limit >= 1 && d.limit <= 3) g.limitCount[d.limit]++;
-    if(d.succ >= 1 && d.succ <= 5) g.succCount[d.succ]++;
-    if(d.task){ (g.tasksByDept[dept] = g.tasksByDept[dept]||[]).push({task:d.task, ts:d.ts||0}); }
-  });
-  return g;
-}
-
-/* 繪製統計畫面:完成人數→自選/診斷雙列→部門 Top3→資安準備度→備課資訊→任務分組 */
-function barRow(label, v, maxV, color){
-  return `<div class="bar-row">
-    <span class="bar-label">${esc(label)}</span>
-    <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${color}"></span></span>
-    <span class="bar-num">${v}</span>
-  </div>`;
-}
-
-function renderStats($box, g){
-  const deptLine = Object.entries(g.deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
-  /* 各主題需求度:自選與診斷分列,不加總 */
-  const codes = Object.keys(CATEGORY_NAMES)
-    .filter(c => (g.topicSel[c]||0) + (g.topicDiag[c]||0) > 0)
-    .sort((a,b) => ((g.topicSel[b]||0)+(g.topicDiag[b]||0)) - ((g.topicSel[a]||0)+(g.topicDiag[a]||0)));
-  const maxTopic = Math.max(1, ...codes.map(c => Math.max(g.topicSel[c]||0, g.topicDiag[c]||0)));
-  const duoRows = codes.map(c => `
-    <div class="duo-row">
-      <span class="bar-label">${c} ${CATEGORY_NAMES[c]}</span>
-      <span class="duo-tracks">
-        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicSel[c]||0)/maxTopic*100)}%;background:var(--bar-1)"></span></span>
-        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicDiag[c]||0)/maxTopic*100)}%;background:var(--bar-2)"></span></span>
-      </span>
-      <span class="duo-nums">${g.topicSel[c]||0}／${g.topicDiag[c]||0}</span>
-    </div>`).join("");
-  /* 各部門 Top3:自選+診斷合計排序,顯示時仍分列 */
-  const deptCols = Object.entries(g.deptTopic).map(([dept, m]) => {
-    const top = Object.entries(m).sort((a,b) => (b[1].sel+b[1].diag) - (a[1].sel+a[1].diag)).slice(0,3);
-    if(!top.length) return "";
-    return `<div class="dept-col"><h4>${esc(dept)}（${g.deptCount[dept]||0} 位）</h4>
-      <ol>${top.map(([c,v]) => `<li>${c} ${CATEGORY_NAMES[c]}<span class="mini-num">自選 ${v.sel}／診斷 ${v.diag}</span></li>`).join("")}</ol></div>`;
-  }).join("");
-  /* 資安準備度 */
-  const maxLit = Math.max(1, ...g.litCount);
-  const litRows = [1,2,3].map(i => barRow(LIT_LABELS[i], g.litCount[i], maxLit, "var(--bar-3)")).join("");
-  /* 講師備課資訊 */
-  const maxMat = Math.max(1, ...g.matCount);
-  const matRows = [1,2,3,4,5].map(i => barRow(MAT_LABELS[i], g.matCount[i], maxMat, "var(--bar-1)")).join("");
-  const maxLimit = Math.max(1, ...g.limitCount);
-  const limitRows = [1,2,3].map(i => barRow(LIMIT_LABELS[i], g.limitCount[i], maxLimit, "var(--bar-2)")).join("");
-  const maxSucc = Math.max(1, ...g.succCount);
-  const succRows = [1,2,3,4,5].map(i => barRow(SUCC_LABELS[i], g.succCount[i], maxSucc, "var(--bar-3)")).join("");
-  /* 實作任務依部門分組,每部門最新 5 筆 */
-  const taskGroups = Object.entries(g.tasksByDept).map(([dept, arr]) =>
-    `<ul class="task-list">${arr.sort((a,b) => b.ts - a.ts).slice(0,5)
-      .map(t => `<li><span class="dept-tag">${esc(dept)}</span>${esc(t.task)}</li>`).join("")}</ul>`).join("");
-  $box.innerHTML = `
-    <h2>大家提出的方向</h2>
-    <p class="hint">已有 ${g.n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名，僅列人數。</p>
-    <h3>各主題需求度</h3>
-    <p class="legend"><span class="dot" style="background:var(--bar-1)"></span>學員自選　<span class="dot" style="background:var(--bar-2)"></span>系統診斷</p>
-    ${duoRows}
-    ${deptCols ? `<h3>各部門最需要的主題</h3><div class="dept-cols">${deptCols}</div>` : ""}
-    <h3>資安準備度</h3>
-    <p class="hint">「分享連結 vs 離線檔案」認知分布；貼過敏感資料或不確定界線：${g.sensCount} 位。</p>
-    ${litRows}
-    <h3>講師備課資訊</h3>
-    <p class="hint">現場素材</p>${matRows}
-    <p class="hint" style="margin-top:12px">資料限制</p>${limitRows}
-    <p class="hint" style="margin-top:12px">成功標準</p>${succRows}
-    ${taskGroups ? `<h3>大家帶來的實作任務</h3>
-    <p class="hint">依部門分組，每部門最多顯示最新 5 筆，看看別人打算怎麼用。</p>${taskGroups}` : ""}`;
-}
-
-/* --- 結果頁 --- */
-function summaryAnswerText(q){
-  const a = answers[q.id];
-  if(q.type === "multitext"){
-    return q.fields.map(f => f.label + "：" + (a[f.key] || "（未填）")).join("；");
-  }
-  const fmt = o => o === OTHER ? "其他（" + (otherTexts[q.id] || "未說明") + "）" : o;
-  return Array.isArray(a) ? (a.length ? a.map(fmt).join("、") : "（未填）") : (a ? fmt(a) : "（未填）");
-}
-
-function buildResultSummaryHtml(){
-  const rows = QUESTIONS.map(q => `
-    <li class="summary-item">
-      <span class="summary-q">${esc(q.title)}</span><span class="summary-a">${esc(summaryAnswerText(q))}</span>
-    </li>`).join("");
-  const tags = buildCategoryTags();
-  return `
-    <div class="summary-title">Claude 工作坊 課前調查回覆</div>
-    <div class="summary-head">
-      <span><strong>姓名</strong>${esc(answers.name)}</span>
-      <span><strong>部門</strong>${esc(answers.dept)}</span>
-      <span><strong>工作內容</strong>${esc(answers.job || "（未填）")}</span>
-    </div>
-    <ul class="summary-list">${rows}</ul>
-    <div class="summary-tags">
-      <span><strong>診斷建議</strong>${esc(tags.diag)}</span>
-      <span><strong>學員自選</strong>${esc(tags.chosen)}</span>
-    </div>`;
-}
-
-function initSummaryToggle(){
-  const $summary = document.getElementById("summary");
-  const $clip = document.getElementById("summaryClip");
-  const $toggle = document.getElementById("summaryToggle");
-  if(!$summary || !$clip || !$toggle) return;
-  const fullHeight = $clip.scrollHeight;
-  const collapsedHeight = Math.max(280, Math.round(fullHeight * 0.5));
-  $summary.style.setProperty("--summary-collapsed-height", collapsedHeight + "px");
-  if(fullHeight <= collapsedHeight + 12){
-    $summary.classList.add("expanded");
-    $toggle.hidden = true;
+function bindDone(){
+  const mine = buildPayload();
+  if(DEMO){
+    setTimeout(() => renderDoneBody(mine, MOCK_RESPONSES.concat(mine)), 800);
     return;
   }
-  $toggle.addEventListener("click", ()=>{
-    const expanded = $summary.classList.toggle("expanded");
-    $toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
-    $toggle.querySelector(".summary-toggle-text").textContent = expanded ? "向上收合" : "向下展開";
-    console.log("[survey] response summary toggled", {expanded});
+  (async () => {
+    let list = null;
+    try{
+      await fetch(API_BASE + "/api/response", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","X-Class-Code":classCode},
+        body: JSON.stringify(mine)
+      });
+    }catch(e){ console.log("[survey] submit failed", e); }
+    try{
+      const r = await fetch(API_BASE + "/api/responses", { headers:{"X-Class-Code":classCode} });
+      if(r.status === 403){
+        try{ sessionStorage.removeItem("classCode"); }catch(e){}
+        classCode = "";
+        gateOk = false;
+        handleStats403();
+        return;
+      }
+      if(r.ok){
+        list = await r.json();
+        if(!list.some(d => d.uid === mine.uid)) list = list.concat(mine);
+      }
+    }catch(e){ console.log("[survey] stats load failed", e); }
+    renderDoneBody(mine, list);
+  })();
+}
+
+function renderDoneBody(mine, list){
+  const a = answers;
+  const diagOnly = mine.diag.filter(c => !mine.topics.includes(c));
+  const chip = (c, kind) =>
+    '<span class="st-chip ' + kind + '"><span class="st-chip-code">' + c + '</span>' + CATEGORY_NAMES[c] + '</span>';
+  const statsHtml = list && list.length
+    ? '<div class="st-stats-head"><h3 class="st-h" style="margin:0">大家提出的方向</h3>' +
+      '<label class="st-switch"><input type="checkbox" id="iviewToggle"><span class="st-switch-track"></span>講師檢視</label></div>' +
+      '<div id="studentStats">' + htmlStudentStats(aggregate(list)) + '</div>' +
+      '<div id="instructorStats" style="display:none">' + htmlInstructorStats(aggregate(list)) + '</div>'
+    : '<h3 class="st-h">大家提出的方向</h3><p class="st-sub">目前讀不到統計資料，稍後重新整理即可，你的回覆已送出。</p>';
+  $screen.querySelector(".sv-step").innerHTML =
+    '<div class="st-done">' +
+      '<div class="st-confirm"><span class="st-check"></span><div>' +
+        '<h2 class="sv-title">已送出，' + (a.name ? esc(a.name) + "，" : "") + '課堂見</h2>' +
+        '<p class="st-sub">講師已收到你的案例，工作坊會直接帶你把它做完</p></div></div>' +
+      '<div class="st-plan"><h3 class="st-h">為你規劃的單元</h3>' +
+        '<div class="st-chips">' + mine.topics.map(c => chip(c,"sel")).join("") + diagOnly.map(c => chip(c,"diag")).join("") + '</div>' +
+        '<p class="st-sub">實心＝你自選的主題；外框＝根據你的作答習慣，建議加聽的單元</p></div>' +
+      htmlSummary() +
+      '<div class="st-stats">' + statsHtml + '</div>' +
+      '<div class="sv-nav"><button class="sv-btn ghost" id="editBtn">回上一步修改</button><span></span></div>' +
+    '</div>';
+  document.getElementById("editBtn").addEventListener("click", back);
+  const $sum = document.getElementById("sumToggle");
+  if($sum) $sum.addEventListener("click", () => {
+    const $s = document.getElementById("summaryBox");
+    const open = $s.style.display === "none";
+    $s.style.display = open ? "" : "none";
+    $sum.parentElement.classList.toggle("open", open);
+    $sum.childNodes[0].textContent = open ? "收合填答摘要" : "查看完整填答摘要";
+  });
+  const $iv = document.getElementById("iviewToggle");
+  if($iv) $iv.addEventListener("change", () => {
+    document.getElementById("instructorStats").style.display = $iv.checked ? "" : "none";
   });
 }
 
-function renderDone(){
-  const result = buildResultSummaryHtml();
-  $screen.innerHTML = `
-    <h1>填寫完成，最後一步</h1>
-    <p class="hint">以下是你的填答摘要，匿名統計會顯示在下方。</p>
-    <section class="summary" id="summary" aria-label="填答摘要">
-      <div class="summary-clip" id="summaryClip">${result}</div>
-      <button type="button" class="summary-toggle" id="summaryToggle" aria-expanded="false" aria-controls="summaryClip">
-        <span class="summary-toggle-text">向下展開</span>
-      </button>
-    </section>
-    <div class="done-actions">
-      <button class="btn btn-ghost" id="editBtn">回上一步</button>
-    </div>
-    <div class="stats" id="statsBox"></div>`;
-  initSummaryToggle();
-
-  /* 網頁版:寫入共用統計後顯示大家的方向;離線 HTML 檔:說明統計僅線上網址可見 */
-  const $statsBox = document.getElementById("statsBox");
-  if(location.protocol !== "file:"){
-    $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">統計載入中。</p>';
-    const mine = buildPayload();
-    (async ()=>{
-      try{
-        try{
-          await submitShared(mine);
-        }catch(e){
-          console.log("[survey] continuing after aggregate submit failure", e);
-        }
-        await loadShared($statsBox, mine);
-      }catch(e){
-        console.log("[survey] completion stats flow failed", e);
-        $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
-      }
-    })();
-  } else {
-    $statsBox.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你開啟的是離線 HTML 檔，統計只會在線上問卷顯示。</p>';
-  }
-
-  document.getElementById("editBtn").addEventListener("click", ()=>{ step = TOTAL; render(); });
+function htmlSummary(){
+  const a = answers, t = a.task;
+  const fmt = q => {
+    const v = a[q.id];
+    const f = o => o === OTHER ? "其他（" + (otherTexts[q.id] || "未說明") + "）" : o;
+    if(q.type === "topics") return v.length ? v.map(c => c + " " + CATEGORY_NAMES[c]).join("、") : "（未填）";
+    return Array.isArray(v) ? (v.length ? v.map(f).join("、") : "（未填）") : (v ? f(v) : "（未填）");
+  };
+  const rows = QUESTIONS.map(q =>
+    '<li><strong>' + esc(q.title) + '</strong><span>' + esc(fmt(q)) + '</span></li>').join("") +
+    '<li><strong>課堂實作任務</strong><span>' + esc(t.task || "（未填）") + '</span></li>' +
+    '<li><strong>現在的做法</strong><span>' + esc(t.now || "（未填）") + '</span></li>' +
+    '<li><strong>成功標準</strong><span>' + esc(t.succ || "（未填）") + '</span></li>' +
+    '<li><strong>現場素材</strong><span>' + esc(t.mat.length ? t.mat.join("、") : "（未填）") + '</span></li>' +
+    '<li><strong>資料限制</strong><span>' + esc(t.limit || "（未填）") + '</span></li>';
+  return '<div class="st-summary">' +
+    '<button type="button" class="st-summary-toggle" id="sumToggle">查看完整填答摘要<span class="st-caret"></span></button>' +
+    '<div class="st-summary-body" id="summaryBox" style="display:none">' +
+      '<div class="st-summary-head">' +
+        '<span><strong>姓名</strong>' + esc(a.name || "（未填）") + '</span>' +
+        '<span><strong>部門</strong>' + esc(a.dept || "（未填）") + '</span>' +
+        '<span><strong>工作內容</strong>' + esc(a.job || "（未填）") + '</span></div>' +
+      '<ul>' + rows + '</ul></div></div>';
 }
 
-/* ====== 工具 ====== */
-function esc(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+/* ===== 統計（學員層） ===== */
+function htmlStudentStats(g){
+  const ranked = Object.keys(CATEGORY_NAMES)
+    .filter(c => (g.topicSel[c]||0) > 0)
+    .sort((a,b) => (g.topicSel[b]||0) - (g.topicSel[a]||0));
+  const max = Math.max(1, ...ranked.map(c => g.topicSel[c]||0));
+  const deptLine = Object.entries(g.deptCount).map(([d,v]) => d + " " + v).join("・");
+  const bars = ranked.map((c, i) =>
+    '<div class="st-bar' + (i < 3 ? " accent" : "") + '">' +
+      '<span class="st-bar-rank">' + (i+1) + '</span>' +
+      '<span class="st-bar-label">' + CATEGORY_NAMES[c] + '</span>' +
+      '<span class="st-bar-track"><span class="st-bar-fill" style="width:' + Math.round((g.topicSel[c]||0)/max*100) + '%"></span></span>' +
+      '<span class="st-bar-num">' + (g.topicSel[c]||0) + '</span></div>').join("");
+  const tasks = g.tasks.map(t =>
+    '<div class="st-task"><span class="st-task-dept">' + esc(t.dept) + '</span>' +
+    '<span class="st-task-text">' + esc(t.task) + '</span></div>').join("");
+  return '<div class="st-student">' +
+    '<div class="st-headline"><span class="st-big">' + g.n + '</span>' +
+      '<span class="st-big-caption">位同仁已完成<em>' + deptLine + '</em></span></div>' +
+    '<h3 class="st-h">大家最想加強的主題</h3><div class="st-rank">' + bars + '</div>' +
+    '<h3 class="st-h">大家帶來的實作任務</h3>' +
+    '<p class="st-sub">匿名顯示，看看其他同仁打算怎麼用</p>' +
+    '<div class="st-tasks">' + tasks + '</div></div>';
+}
+
+/* ===== 統計（講師層） ===== */
+function htmlMiniDist(title, labels, counts){
+  const max = Math.max(1, ...counts.slice(1));
+  return '<div class="st-mini"><h4>' + title + '</h4>' +
+    labels.map((l, i) => i === 0 ? "" :
+      '<div class="st-bar small"><span class="st-bar-label">' + l + '</span>' +
+      '<span class="st-bar-track"><span class="st-bar-fill" style="width:' + Math.round(counts[i]/max*100) + '%"></span></span>' +
+      '<span class="st-bar-num">' + counts[i] + '</span></div>').join("") + '</div>';
+}
+function htmlInstructorStats(g){
+  const rows = Object.keys(CATEGORY_NAMES)
+    .map(c => ({code:c, sel:g.topicSel[c]||0, diag:g.topicDiag[c]||0}))
+    .filter(r => r.sel + r.diag > 0)
+    .sort((a,b) => (b.sel+b.diag) - (a.sel+a.diag));
+  const max = Math.max(1, ...rows.map(r => Math.max(r.sel, r.diag)));
+  const db = rows.map(r => {
+    const a = r.sel/max*100, b = r.diag/max*100;
+    const dots = r.sel === r.diag
+      ? '<span class="st-dot both" style="left:' + a + '%"></span>'
+      : '<span class="st-db-line" style="left:' + Math.min(a,b) + '%;width:' + Math.abs(a-b) + '%"></span>' +
+        '<span class="st-dot sel" style="left:' + a + '%"></span>' +
+        '<span class="st-dot diag" style="left:' + b + '%"></span>';
+    return '<div class="st-db-row">' +
+      '<span class="st-db-label"><strong>' + r.code + '</strong> ' + CATEGORY_NAMES[r.code] + '</span>' +
+      '<span class="st-db-track">' + dots + '</span>' +
+      '<span class="st-db-nums">' + r.sel + '<i>／</i>' + r.diag + '</span></div>';
+  }).join("");
+  const deptCols = Object.entries(g.deptTopic).map(([dept, m]) => {
+    const top = Object.entries(m).sort((a,b) => (b[1].sel+b[1].diag) - (a[1].sel+a[1].diag)).slice(0,3);
+    return '<div class="st-dept-col"><h4>' + esc(dept) + '<span>' + (g.deptCount[dept]||0) + ' 位</span></h4><ol>' +
+      top.map(([c,v]) => '<li><strong>' + c + '</strong> ' + CATEGORY_NAMES[c] +
+        '<i>自選 ' + v.sel + '・診斷 ' + v.diag + '</i></li>').join("") + '</ol></div>';
+  }).join("");
+  return '<div class="st-instructor">' +
+    '<h3 class="st-h">自選 vs 診斷</h3>' +
+    '<p class="st-sub">兩者落差大的主題（如低自選、高診斷）值得在課堂上特別點出</p>' +
+    '<div class="st-dumbbell"><p class="st-legend">' +
+      '<span class="st-dot sel"></span>學員自選 <span class="st-dot diag"></span>系統診斷 ' +
+      '<span class="st-dot both"></span>兩者相同' +
+      '<span class="st-legend-note">診斷＝由作答習慣推導的建議單元</span></p>' + db + '</div>' +
+    '<h3 class="st-h">各部門最需要的主題</h3><div class="st-dept-cols">' + deptCols + '</div>' +
+    '<h3 class="st-h">資安準備度</h3><div class="st-sec-row">' +
+      '<div class="st-callout"><span class="st-big">' + g.sensCount + '</span><span>位貼過敏感資料<br>或不確定界線</span></div>' +
+      htmlMiniDist("「分享連結 vs 離線檔」認知", LIT_LABELS, g.litCount) + '</div>' +
+    '<h3 class="st-h">備課資訊</h3><div class="st-prep-grid">' +
+      htmlMiniDist("現場素材", MAT_LABELS, g.matCount) +
+      htmlMiniDist("資料限制", LIMIT_LABELS, g.limitCount) +
+      htmlMiniDist("成功標準", SUCC_LABELS, g.succCount) + '</div></div>';
 }
 
 render();
+
+
+function handleStats403(){
+  const $statsBox = document.getElementById("screen").querySelector(".st-stats");
+  if(!$statsBox) return;
+  $statsBox.innerHTML = '<h3 class="st-h">大家提出的方向</h3>' +
+    '<p class="sv-hint">通行碼已失效，統計無法載入。請重新輸入課程公告內的通行碼：</p>' +
+    '<div class="sv-gate-row" style="margin-bottom:12px">' +
+      '<input type="text" id="reCode" placeholder="輸入邀請碼" autocomplete="off" style="max-width:320px">' +
+      '<button class="sv-btn primary" id="reVerifyBtn">驗證</button>' +
+    '</div><p class="sv-error" id="reErr" style="display:none"></p>';
+  const $input = document.getElementById("reCode");
+  const $btn = document.getElementById("reVerifyBtn");
+  const $err = document.getElementById("reErr");
+  async function reVerify(){
+    const code = $input.value.trim();
+    if(!code){ $err.textContent = "請輸入通行碼"; $err.style.display = "block"; $input.focus(); return; }
+    $btn.disabled = true; $btn.textContent = "驗證中…"; $err.style.display = "none";
+    try{
+      const r = await fetch(API_BASE + "/api/verify", { headers: {"X-Class-Code": code} });
+      if(r.ok){
+        classCode = code;
+        gateOk = true;
+        try{ sessionStorage.setItem("classCode", code); }catch(e){}
+        bindDone();
+        return;
+      }
+      $err.textContent = r.status === 403 ? "通行碼不正確，請確認課程公告" : "驗證服務暫時無法使用，請稍後再試";
+      $err.style.display = "block";
+    }catch(e){
+      $err.textContent = "連線失敗，請確認網路後再試";
+      $err.style.display = "block";
+    }
+    $btn.disabled = false; $btn.textContent = "驗證";
+    $input.focus();
+  }
+  $btn.addEventListener("click", reVerify);
+  $input.addEventListener("keydown", e => { if(e.key === "Enter") reVerify(); });
+  $input.focus();
+}
+
 </script>
 </body>
 </html>

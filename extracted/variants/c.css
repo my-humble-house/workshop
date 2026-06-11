@@ -1,0 +1,81 @@
+/* ===== 方向 C：桌面雙欄版 ===== */
+:root{
+  --font-display:"Noto Serif TC","PingFang TC",serif;
+  --bg:#F4F3F0;
+  --shadow-side:6px 0 28px rgba(20,32,40,.16);
+  --shadow-card:0 2px 6px rgba(20,32,40,.05),0 14px 34px rgba(20,32,40,.08);
+  --shadow-card-hover:0 4px 10px rgba(20,32,40,.07),0 18px 44px rgba(20,32,40,.12);
+  --glow-accent:0 0 0 3px rgba(59,93,107,.14),0 6px 20px rgba(59,93,107,.16);
+  --glow-sage:0 0 14px rgba(159,184,171,.55);
+}
+.vc{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+
+/* --- 深色側欄 --- */
+.vc-side{
+  background:#142028;color:#E9E6DF;
+  display:flex;flex-direction:column;
+  padding:36px 28px 30px;
+  position:sticky;top:0;height:100vh;
+  box-shadow:var(--shadow-side);z-index:2;
+}
+.vc-side-brand{display:flex;flex-direction:column;gap:2px}
+.vc-logo{width:86px;height:auto;display:block;margin-bottom:16px}
+.vc-side-kicker{font-size:10.5px;font-weight:600;letter-spacing:.32em;color:#9FB8AB}
+.vc-side-title{font-family:var(--font-display);font-size:25px;font-weight:700;letter-spacing:.12em;color:#F4F1EA}
+
+.sv-checklist{list-style:none;margin-top:40px;display:flex;flex-direction:column;gap:5px}
+.sv-checklist li{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:5px;
+  font-size:14.5px;color:rgba(233,230,223,.48);
+  transition:background .25s ease,color .25s ease;
+}
+.sv-checklist li.current{background:rgba(255,255,255,.08);color:#FFFFFF}
+.sv-checklist li.done{color:rgba(233,230,223,.8)}
+.sv-cl-mark{
+  flex:none;width:18px;height:18px;display:grid;place-items:center;
+  border:1.5px solid rgba(233,230,223,.35);border-radius:50%;position:relative;
+  transition:border-color .25s ease,background .25s ease,box-shadow .25s ease;
+}
+.sv-checklist li.current .sv-cl-mark{border-color:#9FB8AB;box-shadow:var(--glow-sage)}
+.sv-checklist li.done .sv-cl-mark{background:#9FB8AB;border-color:#9FB8AB}
+.sv-checklist li.done .sv-cl-mark::after{
+  content:"";width:4px;height:8px;margin-top:-2px;
+  border-right:2px solid #142028;border-bottom:2px solid #142028;transform:rotate(42deg);
+}
+.sv-cl-title{flex:1;font-weight:600}
+.sv-cl-count{font-size:11.5px;opacity:.55;font-variant-numeric:tabular-nums}
+
+.vc-side-foot{margin-top:auto;padding-top:20px}
+.vc-side-count{font-size:13px;color:rgba(233,230,223,.66);font-variant-numeric:tabular-nums}
+.vc-side-count strong{font-size:17px;color:#FFFFFF}
+.vc-side-bar{height:3px;background:rgba(255,255,255,.14);margin-top:10px;border-radius:99px;overflow:hidden}
+.vc-side-bar i{display:block;height:100%;background:#9FB8AB;transition:width .35s ease;box-shadow:var(--glow-sage)}
+@media (prefers-reduced-motion: reduce){.vc-side-bar i{transition:none}}
+
+/* --- 內容區 --- */
+.vc-main{padding:66px 76px 80px;background:linear-gradient(160deg,#F6F5F2 0%,#F4F3F0 60%,#EFEAE1 100%)}
+.vc-content{max-width:680px}
+.vc .sv-title{font-family:var(--font-display);font-size:29px}
+.vc .st-h{font-family:var(--font-display)}
+.vc .sv-welcome .sv-display{font-size:46px}
+.vc .sv-parts-preview{display:none}   /* 側欄已有部分清單 */
+.vc .sv-opt,.vc .sv-topic,.vc .st-task,.vc .st-dept-col,.vc .st-callout,
+.vc .st-plan,.vc .st-summary-body{box-shadow:var(--shadow-card)}
+.vc .sv-opt:hover,.vc .sv-topic:hover{box-shadow:var(--shadow-card-hover)}
+.vc .sv-opt.selected,.vc .sv-topic.selected{box-shadow:var(--glow-accent)}
+.vc input[type=text]:focus,.vc textarea:focus{box-shadow:0 0 0 3px rgba(59,93,107,.18),0 6px 18px rgba(59,93,107,.12)}
+.vc .sv-btn.primary{box-shadow:0 6px 18px rgba(59,93,107,.22)}
+.vc .sv-btn.primary:hover{box-shadow:0 8px 26px rgba(59,93,107,.32)}
+.vc .st-check{box-shadow:var(--glow-accent)}
+.vc .sv-section{min-height:56vh;align-items:flex-start;text-align:left}
+.vc .sv-section-num{font-size:96px}
+
+@media (max-width:900px){
+  .vc{grid-template-columns:1fr}
+  .vc-side{position:static;height:auto;flex-direction:row;align-items:center;gap:18px;padding:16px 20px}
+  .vc-logo{width:54px;margin-bottom:0}
+  .sv-checklist{display:none}
+  .vc-side-foot{margin-top:0;margin-left:auto;padding-top:0;min-width:120px}
+  .vc-main{padding:34px 22px 60px}
+}

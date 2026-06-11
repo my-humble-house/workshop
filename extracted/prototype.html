@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>課前調查・互動原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/base.css">
+<script>
+  /* 讀取網址參數並載入對應方向的樣式 */
+  (function(){
+    const sp = new URLSearchParams(location.search);
+    window.PARAMS = {
+      variant: ["a","b","c"].includes(sp.get("variant")) ? sp.get("variant") : "a",
+      screen: sp.get("screen") || "welcome",
+      iview: sp.get("iview") === "1"
+    };
+    document.write('<link rel="stylesheet" href="variants/' + window.PARAMS.variant + '.css">');
+  })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="data/questions.js"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="components/flow.jsx"></script>
+<script type="text/babel" src="components/stats.jsx"></script>
+<script type="text/babel" src="components/shell.jsx"></script>
+<script type="text/babel" src="variants/shells.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#3B5D6B",
+  "autoAdvance": true,
+  "instructorOpen": true
+}/*EDITMODE-END*/;
+
+function App(){
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const variant = window.PARAMS.variant;
+  const accent = t.accent || (variant === "b" ? "#4F7A62" : "#3B5D6B");
+  const tweaks = {
+    accent,
+    autoAdvance: t.autoAdvance,
+    instructorOpen: t.instructorOpen || window.PARAMS.iview
+  };
+  const Shell = variant === "b" ? VariantB : variant === "c" ? VariantC : VariantA;
+  return (
+    <React.Fragment>
+      <Shell t={tweaks} />
+      <TweaksPanel>
+        <TweakSection label="色彩" />
+        <TweakColor label="強調色" value={accent}
+          options={["#3B5D6B", "#4F7A62", "#81603F"]}
+          onChange={v => setTweak("accent", v)} />
+        <TweakSection label="互動" />
+        <TweakToggle label="單選後自動跳下一題" value={t.autoAdvance}
+          onChange={v => setTweak("autoAdvance", v)} />
+        <TweakToggle label="完成頁預設展開講師檢視" value={tweaks.instructorOpen}
+          onChange={v => setTweak("instructorOpen", v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
