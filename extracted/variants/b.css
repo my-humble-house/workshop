@@ -1,0 +1,48 @@
+/* ===== 方向 B：輕快內部版 ===== */
+:root{
+  --font-display:"Noto Sans TC","PingFang TC",sans-serif;
+  --bg:#F7F5F1;
+  --radius:9px;
+  --radius-lg:14px;
+  --line:rgba(44,42,36,.13);
+}
+.vb{min-height:100vh;display:flex;flex-direction:column}
+.vb-head{
+  width:min(100%,860px);margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:20px 24px 14px;
+}
+.vb-lockup{display:flex;align-items:center;gap:13px}
+.vb-logo{width:44px;height:auto;display:block}
+.vb-brand{font-size:15px;font-weight:700;letter-spacing:.14em;display:flex;align-items:baseline;gap:10px}
+.vb-brand i{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;color:var(--muted)}
+.vb-head-tag{font-size:12.5px;font-weight:600;letter-spacing:.14em;color:var(--muted);white-space:nowrap}
+.vb-main{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:8px 20px 64px}
+.vb-card{
+  width:min(100%,740px);background:var(--paper);
+  border:1px solid var(--line);border-radius:18px;
+  padding:34px 40px 30px;
+  box-shadow:0 12px 40px rgba(44,42,36,.07);
+}
+.vb .sv-btn{border-radius:99px}
+.vb .sv-opt{border-radius:var(--radius)}
+.vb .sv-topic{border-radius:var(--radius-lg)}
+.vb input[type=text],.vb textarea{border-radius:var(--radius)}
+.vb .sv-prog-seg{height:6px}
+.vb .sv-error{border-radius:99px;border-left:0;padding:7px 18px}
+.vb .sv-mark.check{border-radius:6px}
+.vb .sv-section-num{
+  width:120px;height:120px;display:grid;place-items:center;border-radius:50%;
+  background:var(--accent-soft);font-size:56px;margin-bottom:10px;
+}
+.vb .sv-display{font-family:var(--font-body);letter-spacing:.03em}
+.vb .st-bar-track{border-radius:99px}
+.vb .st-bar-fill{border-radius:99px}
+.vb .st-callout{border-radius:var(--radius-lg)}
+
+@media (max-width:720px){
+  .vb-head{padding:14px 16px 10px}
+  .vb-head-tag{display:none}
+  .vb-card{padding:26px 22px;border-radius:14px}
+  .vb-main{padding:4px 12px 48px}
+}

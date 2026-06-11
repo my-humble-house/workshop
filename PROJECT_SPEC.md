@@ -9,3 +9,5 @@
 2026-06-11 | 調查表冷暖低彩度配色 | 前台配色改為冷灰石墨主背景搭配溫灰清水模互動重點；保留 75% 毛玻璃、單色漸層、不使用分割圖或 SVG，視覺規範同步放寬為指定低彩度色票 | none
 2026-06-11 | 寒舍集團內部表單風格 | 參考 mhh-group.com 的黑白 logo、深藍灰、沉穩綠與大面積留白，前台改為文字式 MHH 品牌識別、淺色紙面表單、細線與方角元件；不直接嵌入外部 logo 圖檔，AGENTS/CLAUDE/視覺規範同步禁止回到 AI 式深色玻璃卡與膠囊配色 | none
 2026-06-11 | 官方 logo 與表頭精簡 | 從 mhh-group.com/images/m_03.png 取得官方 PNG 並存為 assets/mhh-logo.png；左上品牌區改用本機官方 logo，移除右上 INTERNAL SURVEY 文字，AGENTS/CLAUDE/視覺規範同步要求 logo 只能 repo-local 不外部熱連 | none
+2026-06-11 | 雙欄版面與流程改版整合 | 套用方案 C 設計，改為桌面雙欄左側導覽版面（常駐大綱進度與清水模綠進度條）；課堂實作四題合併為單一頁面；移除 Part 換頁中繼頁；完整保留課程驗證通行碼、過期 403 重新導向驗證、SEO 等防護機制；移除 Google Fonts 等外部連結 | classCode / CLASS_CODE
+

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>課前調查・方案 C 預覽</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="final/styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="side">
+      <div class="side-brand">
+        <!-- Logo 使用本機 assets/mhh-logo.png -->
+        <img class="side-logo" src="assets/mhh-logo.png" alt="寒舍餐旅管理顧問">
+        <span class="side-kicker">CLAUDE 工作坊</span>
+        <span class="side-title">課前調查</span>
+      </div>
+      <ol class="checklist" id="checklist">
+        <!-- 由 app.js 動態渲染 -->
+      </ol>
+      <div class="side-foot">
+        <span class="side-count" id="sideCount"></span>
+        <div class="side-bar"><i id="sideBarFill"></i></div>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="content" id="screen">
+        <!-- 由 app.js 動態渲染 -->
+      </div>
+    </main>
+  </div>
+
+  <script src="final/data.js"></script>
+  <script src="final/app.js"></script>
+</body>
+</html>

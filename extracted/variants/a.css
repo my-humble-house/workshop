@@ -1,0 +1,53 @@
+/* ===== 方向 A：官網沉穩版 ===== */
+:root{
+  --font-display:"Noto Serif TC","PingFang TC",serif;
+  --bg:#F2F0EB;
+}
+.va{min-height:100vh;display:flex;flex-direction:column}
+.va-mast{
+  background:#16242B;display:flex;align-items:center;gap:20px;
+  padding:14px 36px;
+}
+.va-logo{width:62px;height:auto;display:block}
+.va-brand{display:flex;flex-direction:column;line-height:1.5}
+.va-brand-kicker{font-size:10px;font-weight:600;letter-spacing:.32em;color:rgba(244,241,234,.5)}
+.va-brand-title{font-size:15px;font-weight:600;letter-spacing:.18em;color:#F4F1EA}
+.va-mast-tag{
+  margin-left:auto;font-size:12px;font-weight:600;letter-spacing:.3em;
+  color:rgba(244,241,234,.78);border:1px solid rgba(244,241,234,.28);
+  padding:5px 16px 5px 19px;white-space:nowrap;
+}
+.va-main{
+  flex:1;display:flex;justify-content:center;align-items:flex-start;
+  padding:46px 20px 70px;
+  background:linear-gradient(160deg,#F4F2EE 0%,#F2F0EB 55%,#ECE7DD 100%);
+}
+.va-card{
+  width:min(100%,780px);background:var(--paper);
+  border:1px solid var(--line);border-top:3px solid #16242B;
+  padding:34px 44px 30px;
+  box-shadow:0 26px 64px rgba(22,36,43,.10);
+  transition:background .4s ease;
+}
+.va .sv-title,.va .st-h{font-family:var(--font-display)}
+.va .sv-title{letter-spacing:.04em}
+
+/* 過場頁：整卡反白成深色，serif 大字 */
+.va[data-kind="section"] .va-card{background:#16242B;border-color:#16242B}
+.va[data-kind="section"] .sv-section-num{color:#9FB8AB}
+.va[data-kind="section"] .sv-section-title{color:#F4F1EA}
+.va[data-kind="section"] .sv-section-meta{color:rgba(244,241,234,.55)}
+.va[data-kind="section"] .sv-section-blurb{color:rgba(244,241,234,.72)}
+.va[data-kind="section"] .sv-section-skip{color:rgba(244,241,234,.45)}
+.va[data-kind="section"] .sv-prog-section{color:rgba(244,241,234,.85)}
+.va[data-kind="section"] .sv-prog-count{color:rgba(244,241,234,.6)}
+.va[data-kind="section"] .sv-prog-seg{background:rgba(244,241,234,.14)}
+.va[data-kind="section"] .sv-prog-seg i{background:#9FB8AB}
+
+@media (max-width:720px){
+  .va-mast{padding:12px 18px;gap:14px}
+  .va-brand-kicker{display:none}
+  .va-mast-tag{display:none}
+  .va-card{padding:26px 22px}
+  .va-main{padding:24px 14px 50px}
+}
