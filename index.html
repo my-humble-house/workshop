@@ -65,30 +65,17 @@
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
     .card{background:var(--mhh-paper)}
   }
-  /* ===== 品牌標頭：參考集團黑白章紋與官網導覽語氣，使用文字式識別 ===== */
+  /* ===== 品牌標頭：使用 repo-local 官方 logo，避免外部熱連 ===== */
   .brand-masthead{
-    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    display:flex;align-items:center;gap:20px;
     padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);
   }
   .brand-lockup{display:flex;align-items:center;gap:16px;min-width:0}
-  .brand-seal{
-    width:62px;height:62px;flex:none;display:grid;place-items:center;position:relative;
-    background:var(--mhh-black);color:var(--mhh-paper);border:1px solid var(--mhh-black);
-    font-size:18px;font-weight:700;letter-spacing:.08em;line-height:1;
-  }
-  .brand-seal::before,.brand-seal::after{
-    content:"";position:absolute;left:11px;right:11px;border-top:1px solid rgba(255,255,255,.72);
-  }
-  .brand-seal::before{top:15px}
-  .brand-seal::after{bottom:15px}
+  .brand-logo{width:92px;height:auto;flex:none;display:block}
   .brand-copy{min-width:0}
   .brand-kicker{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--mhh-blue);line-height:1.4}
   .brand-title{font-size:20px;font-weight:700;letter-spacing:.18em;line-height:1.45;margin-top:2px}
   .brand-subtitle{font-size:13px;color:var(--mhh-muted);letter-spacing:.08em;line-height:1.5;margin-top:2px}
-  .brand-meta{
-    flex:none;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--mhh-muted);
-    border-left:1px solid var(--line);padding-left:18px;text-align:right;line-height:1.5;
-  }
   /* ===== 進度條 ===== */
   .progress-wrap{margin-bottom:20px}
   .progress-label{font-size:16px;font-weight:600;letter-spacing:.18em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
@@ -192,9 +179,8 @@
     body{padding:18px 12px}
     .card{padding:22px 18px 22px;border-radius:2px}
     .brand-masthead{align-items:flex-start;gap:14px}
-    .brand-seal{width:54px;height:54px;font-size:16px}
+    .brand-logo{width:76px}
     .brand-title{font-size:18px}
-    .brand-meta{display:none}
     h1{font-size:21px}h2{font-size:18px}
   }
 </style>
@@ -203,14 +189,13 @@
 <div class="card">
   <div class="brand-masthead" aria-label="寒舍集團內部調查">
     <div class="brand-lockup">
-      <div class="brand-seal" aria-hidden="true">MHH</div>
+      <img class="brand-logo" src="assets/mhh-logo.png" alt="寒舍餐旅管理顧問">
       <div class="brand-copy">
         <div class="brand-kicker">MY HUMBLE HOUSE</div>
         <div class="brand-title">寒舍集團</div>
         <div class="brand-subtitle">內部工作坊課前調查</div>
       </div>
     </div>
-    <div class="brand-meta">INTERNAL<br>SURVEY</div>
   </div>
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>

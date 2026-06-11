@@ -11,7 +11,7 @@
 - 禁止 JS framework，例如 React、Vue、Svelte。
 - 禁止 icon font，例如 FontAwesome、Material Icons；不得使用 SVG 繪圖，必要圖示需使用 CSS。
 - 禁止外部字型，一律使用裝置內建字型（PingFang TC、Microsoft JhengHei、Noto Sans TC、system-ui）。
-- 視覺設計（色彩、字級、文字顏色規則、CSS 背景、內部表單紙面、品牌識別）必須遵守 `docs/specs/2026-06-10-visual-design-system.md`；其中「所有可見色彩取自 MHH 內部色票、所有內容文字一律使用同一 `--ink`、不得使用 SVG 繪圖或外部 logo 圖檔」為強制規則，調整任何頁面前必須先讀該規範。
+- 視覺設計（色彩、字級、文字顏色規則、CSS 背景、內部表單紙面、品牌識別）必須遵守 `docs/specs/2026-06-10-visual-design-system.md`；其中「所有可見色彩取自 MHH 內部色票、所有內容文字一律使用同一 `--ink`、不得使用 SVG 繪圖、logo 必須使用 repo-local 官方 PNG 而不得外部熱連」為強制規則，調整任何頁面前必須先讀該規範。
 
 ## 資料與隱私
 

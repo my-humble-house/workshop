@@ -75,7 +75,7 @@ Logo / 文字黑白：`#050505` `#FFFFFF`
 - 底 `--paper`，可保留 `backdrop-filter:blur(10px)`（含 `-webkit-` 前綴）作為輕微紙面透氣感，但不得做深色玻璃卡。
 - 描邊 `1px solid --line`，上緣黑色品牌線 `4px solid #050505`，陰影 `0 20px 54px --shadow`。
 - **圓角克制**：桌面與行動皆 2–4px；不得使用大型膠囊、超大圓角或不對稱圓角。
-- 表單頂部必須保留文字式品牌識別：`MHH` 黑底方章、`MY HUMBLE HOUSE`、`寒舍集團`、`內部工作坊課前調查`。除非有正式授權檔，不直接嵌入官網 logo 圖片。
+- 表單頂部必須使用 repo-local 官方 logo PNG：`assets/mhh-logo.png`，搭配 `MY HUMBLE HOUSE`、`寒舍集團`、`內部工作坊課前調查`。不得外部熱連官網圖片，不使用 SVG logo。
 
 ## 元件規範
 
