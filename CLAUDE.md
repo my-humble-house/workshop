@@ -9,9 +9,9 @@
 - 前台必須使用原生 HTML、CSS、Vanilla JS，問卷整體維持單一 `index.html`，不得引入建置流程（bundler、framework CLI）。
 - 禁止 CSS framework，例如 Tailwind、Bootstrap。
 - 禁止 JS framework，例如 React、Vue、Svelte。
-- 禁止 icon font，例如 FontAwesome、Material Icons；圖示需使用 SVG 或 CSS。
+- 禁止 icon font，例如 FontAwesome、Material Icons；不得使用 SVG 繪圖，必要圖示需使用 CSS。
 - 禁止外部字型，一律使用裝置內建字型（PingFang TC、Microsoft JhengHei、Noto Sans TC、system-ui）。
-- 視覺設計（色彩、字級、文字顏色規則、幾何背景、毛玻璃元件）必須遵守 `docs/specs/2026-06-10-visual-design-system.md`；其中「除襯底與標籤外，所有文字一律使用同一深色 `--ink`」為強制規則，調整任何頁面前必須先讀該規範。
+- 視覺設計（色彩、字級、文字顏色規則、CSS 清水模底圖、毛玻璃元件）必須遵守 `docs/specs/2026-06-10-visual-design-system.md`；其中「所有可見色彩取自清水模灰階色票、所有內容文字一律使用同一 `--ink`、不得使用 SVG 繪圖」為強制規則，調整任何頁面前必須先讀該規範。
 
 ## 資料與隱私
 

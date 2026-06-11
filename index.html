@@ -8,15 +8,32 @@
 <style>
   /* ===== 清水模毛玻璃設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
   :root{
-    --ink:#242826;             /* 唯一文字深色：除襯底與標籤外所有文字同色 */
-    --accent:#2B2F2D;          /* 炭墨跳色：選中、主按鈕、進度、標籤襯底 */
-    --accent-press:#1A1D1C;
-    --on-dark:#EFF1EE;         /* 深色襯底上的文字 */
-    --bg:#A8ABA6;              /* 深清水模灰 */
-    --glass:rgba(244,245,243,.55);
-    --glass-solid:rgba(244,245,243,.93);
-    --row:rgba(255,255,255,.6);
-    --line:rgba(255,255,255,.7);
+    --concrete-950:#0E0F0E;
+    --concrete-900:#1C1D1C;
+    --concrete-800:#363736;
+    --concrete-700:#4A4A4A;
+    --concrete-650:#575757;
+    --concrete-600:#616261;
+    --concrete-500:#6B6C6C;
+    --concrete-400:#777878;
+    --concrete-300:#868686;
+    --concrete-200:#999999;
+    --concrete-100:#A1A2A1;
+    --concrete-050:#AFAFAF;
+    --ink:var(--concrete-050);             /* 唯一內容文字色：由底圖最亮灰取樣 */
+    --accent:var(--concrete-200);          /* 選中、主按鈕、進度、標籤襯底 */
+    --accent-press:var(--concrete-300);
+    --on-accent:var(--concrete-950);       /* 亮色襯底上的文字 */
+    --bg:var(--concrete-900);              /* 底圖最深主色 */
+    --glass:rgba(28,29,28,.78);            /* 毛玻璃同取最深色 */
+    --glass-solid:var(--concrete-900);
+    --row:rgba(54,55,54,.82);
+    --line:rgba(153,153,153,.44);
+    --shadow:rgba(14,15,14,.62);
+    --bar-1:var(--concrete-100);
+    --bar-2:var(--concrete-200);
+    --bar-3:var(--concrete-300);
+    --bar-4:var(--concrete-400);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -24,21 +41,36 @@
     font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
     background:var(--bg);
     color:var(--ink);
+    width:100%;
     display:flex;justify-content:center;align-items:flex-start;
     padding:40px 16px;
     line-height:1.7;
+    overflow-x:hidden;
   }
-  /* ===== 幾何背景：與卡片同色系、僅靠透明度融入 ===== */
-  .geo{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  /* ===== CSS 清水模底圖：取樣灰階色票，不使用 SVG ===== */
+  body::before,body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none}
+  body::before{
+    background:
+      linear-gradient(135deg,rgba(14,15,14,.72) 0 17%,transparent 17.2%),
+      linear-gradient(135deg,transparent 0 45%,rgba(74,74,74,.9) 45.2% 63%,rgba(153,153,153,.36) 63.2% 100%),
+      linear-gradient(315deg,transparent 0 52%,rgba(97,98,97,.86) 52.2% 58%,rgba(161,162,161,.28) 58.2% 100%),
+      linear-gradient(145deg,var(--concrete-800) 0%,var(--concrete-700) 48%,var(--concrete-500) 100%);
+  }
+  body::after{
+    opacity:.5;
+    background:
+      repeating-linear-gradient(0deg,rgba(175,175,175,.018) 0 1px,transparent 1px 4px),
+      repeating-linear-gradient(90deg,rgba(14,15,14,.026) 0 1px,transparent 1px 5px);
+  }
   .card{
     position:relative;z-index:1;
-    width:100%;max-width:620px;
+    width:min(100%,620px);min-width:0;
     background:var(--glass);
     -webkit-backdrop-filter:blur(18px);
     backdrop-filter:blur(18px);
     border:1px solid var(--line);
     border-radius:30px 30px 76px 30px;
-    box-shadow:0 22px 46px rgba(42,46,44,.22);
+    box-shadow:0 22px 46px var(--shadow);
     padding:36px 34px 30px;
   }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -62,12 +94,12 @@
   .opt{
     width:100%;text-align:left;
     font-size:16px;font-family:inherit;color:var(--ink);
-    background:var(--row);border:1.5px solid transparent;border-radius:11px;
+    background:var(--row);border:1.5px solid var(--line);border-radius:11px;
     padding:13px 18px;cursor:pointer;
   }
   .opt:hover{border-color:var(--accent)}
   .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-dark);font-weight:600}
+  .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
   /* ===== 輸入欄位 ===== */
   .field{margin-bottom:18px}
   .field-row{display:flex;gap:12px}
@@ -76,7 +108,7 @@
   .field label{display:block;font-size:16px;font-weight:600;margin-bottom:6px}
   input[type=text],textarea{
     width:100%;font-size:16px;font-family:inherit;color:var(--ink);
-    border:1.5px solid transparent;border-radius:11px;padding:12px 16px;background:var(--row);
+    border:1.5px solid var(--line);border-radius:11px;padding:12px 16px;background:var(--row);
   }
   input[type=text]::placeholder,textarea::placeholder{color:var(--ink);opacity:.45}
   input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
@@ -88,27 +120,44 @@
     border-radius:99px;padding:12px 28px;cursor:pointer;border:1.5px solid transparent;
   }
   .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .btn-primary{background:var(--accent);color:var(--on-dark)}
+  .btn-primary{background:var(--accent);color:var(--on-accent)}
   .btn-primary:hover{background:var(--accent-press)}
   .btn-ghost{background:none;color:var(--ink);padding:12px 10px}
   .btn-ghost:hover{text-decoration:underline}
-  /* 錯誤提示：炭墨填底膠囊，不用紅色 */
-  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-dark);font-size:13px;font-weight:600;border-radius:99px;padding:6px 16px;margin:-10px 0 16px}
+  /* 錯誤提示：同色票襯底膠囊，不用紅色 */
+  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;border-radius:99px;padding:6px 16px;margin:-10px 0 16px}
   /* ===== 結果頁 ===== */
   .summary{
-    background:var(--row);border-radius:14px;
-    padding:14px 16px;font-size:16px;line-height:1.55;margin-bottom:18px;
+    position:relative;font-size:16px;line-height:1.55;margin-bottom:18px;
   }
+  .summary-clip{position:relative;overflow:hidden;max-height:var(--summary-collapsed-height,360px)}
+  .summary:not(.expanded) .summary-clip{
+    -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 56px),transparent);
+    mask-image:linear-gradient(to bottom,#000 calc(100% - 56px),transparent);
+  }
+  .summary.expanded .summary-clip{max-height:none;-webkit-mask-image:none;mask-image:none}
+  .summary-title{font-size:18px;font-weight:700;margin-bottom:8px}
   .summary-head,.summary-tags{display:flex;flex-wrap:wrap;gap:6px 14px}
   .summary-head{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
   .summary-head span,.summary-tags span,.summary-head strong,.summary-tags strong{font-size:16px}
   .summary-head strong,.summary-tags strong{font-weight:600;margin-right:4px}
   .summary-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-  .summary-item{display:grid;grid-template-columns:minmax(168px,15em) 1fr;gap:4px 12px;align-items:start}
-  .summary-q,.summary-a{font-size:16px}
+  .summary-item{font-size:16px}
+  .summary-q,.summary-a{display:inline;font-size:16px}
   .summary-q{font-weight:600}
+  .summary-a::before{content:"：";font-weight:400}
   .summary-a{overflow-wrap:anywhere}
   .summary-tags{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+  .summary-toggle{
+    display:flex;align-items:center;gap:6px;margin:10px auto 0;padding:8px 4px;
+    border:0;background:none;color:var(--ink);font-size:16px;font-family:inherit;font-weight:600;cursor:pointer;
+  }
+  .summary-toggle::after{
+    content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;
+    transform:rotate(45deg);transition:transform .2s ease;margin-top:-4px;
+  }
+  .summary-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:99px}
+  .summary.expanded .summary-toggle::after{transform:rotate(225deg);margin-top:4px}
   .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .other-wrap{display:none;margin-top:-2px}
   .other-wrap.show{display:block}
@@ -123,64 +172,13 @@
   .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
   .task-list{list-style:none;margin-top:8px}
   .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
-  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-dark);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
+  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
   @media (max-width:480px){.bar-label{flex-basis:8em}}
-  @media (max-width:480px){.summary-item{grid-template-columns:1fr;gap:2px}.summary{padding:13px 14px}}
+  @media (prefers-reduced-motion: reduce){.summary-toggle::after{transition:none}}
   @media (max-width:480px){.card{padding:28px 22px 24px;border-radius:24px 24px 52px 24px}h1{font-size:21px}h2{font-size:18px}}
 </style>
 </head>
 <body>
-<svg class="geo" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter></defs>
-  <circle cx="1070" cy="140" r="190" fill="#F4F5F3" opacity=".16" filter="url(#soft)"/>
-  <circle cx="310" cy="730" r="180" fill="#F4F5F3" opacity=".14" filter="url(#soft)"/>
-  <g fill="none" stroke="#F4F5F3" stroke-width="1.5">
-    <circle cx="1070" cy="155" r="150" stroke-opacity=".5"/>
-    <circle cx="1070" cy="155" r="104" stroke-opacity=".34"/>
-    <circle cx="1070" cy="155" r="58" stroke-opacity=".2"/>
-    <circle cx="210" cy="685" r="126" stroke-opacity=".44"/>
-    <circle cx="210" cy="685" r="82" stroke-opacity=".26"/>
-    <circle cx="1210" cy="520" r="78" stroke-opacity=".36"/>
-    <circle cx="1210" cy="520" r="34" stroke-opacity=".2"/>
-  </g>
-  <g fill="#F4F5F3">
-    <polygon points="405,548 548,800 262,800" opacity=".18" transform="rotate(11 405 716)"/>
-    <polygon points="188,168 306,386 70,386" opacity=".15" transform="rotate(-10 188 300)"/>
-    <rect x="1018" y="612" width="116" height="116" opacity=".14" transform="rotate(45 1076 670)"/>
-    <rect x="340" y="105" width="62" height="62" opacity=".14" transform="rotate(45 371 136)"/>
-  </g>
-  <g fill="none" stroke="#F4F5F3" stroke-width="1.5">
-    <polygon points="432,520 584,788 280,788" stroke-opacity=".46" transform="rotate(11 432 692)"/>
-    <polygon points="202,142 336,386 68,386" stroke-opacity=".42" transform="rotate(-10 202 282)"/>
-    <rect x="985" y="585" width="170" height="170" stroke-opacity=".46" transform="rotate(45 1070 670)"/>
-    <rect x="330" y="88" width="92" height="92" stroke-opacity=".4" transform="rotate(45 376 134)"/>
-    <rect x="1258" y="664" width="112" height="112" stroke-opacity=".38" transform="rotate(45 1314 720)"/>
-  </g>
-  <g stroke="#F4F5F3" stroke-width="1.5">
-    <line x1="540" y1="140" x2="710" y2="42" stroke-opacity=".46"/>
-    <line x1="582" y1="174" x2="752" y2="76" stroke-opacity=".32"/>
-    <line x1="624" y1="208" x2="794" y2="110" stroke-opacity=".2"/>
-    <line x1="738" y1="782" x2="912" y2="684" stroke-opacity=".44"/>
-    <line x1="780" y1="816" x2="954" y2="718" stroke-opacity=".3"/>
-    <line x1="822" y1="850" x2="996" y2="752" stroke-opacity=".18"/>
-    <line x1="108" y1="466" x2="246" y2="388" stroke-opacity=".38"/>
-    <line x1="108" y1="506" x2="246" y2="428" stroke-opacity=".24"/>
-  </g>
-  <g fill="#F4F5F3">
-    <circle cx="300" cy="430" r="4" opacity=".55"/>
-    <circle cx="332" cy="460" r="3" opacity=".42"/>
-    <circle cx="364" cy="492" r="2.5" opacity=".3"/>
-    <circle cx="846" cy="76" r="3.5" opacity=".52"/>
-    <circle cx="888" cy="106" r="2.5" opacity=".35"/>
-    <circle cx="1160" cy="346" r="4" opacity=".46"/>
-    <circle cx="1200" cy="374" r="2.8" opacity=".32"/>
-    <circle cx="620" cy="850" r="4" opacity=".5"/>
-    <circle cx="662" cy="820" r="3" opacity=".36"/>
-    <circle cx="704" cy="790" r="2.5" opacity=".24"/>
-    <circle cx="1320" cy="210" r="4" opacity=".46"/>
-    <circle cx="1354" cy="244" r="3" opacity=".32"/>
-  </g>
-</svg>
 <div class="card">
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>
@@ -602,7 +600,7 @@ async function loadShared($box, mine){
 }
 
 /* 繪製統計畫面:主題長條 + 各部門實作任務方向 */
-const BAR_SHADES = ["#2B2F2D","#4A4F4C","#6B6F6B","#8A8D88"];   // 依名次由深到淺(規範定義的單色階)
+const BAR_SHADES = ["var(--bar-1)","var(--bar-2)","var(--bar-3)","var(--bar-4)"];   // 依名次取底圖灰階色票
 function renderStats($box, topicCount, deptCount, tasks, n){
   const entries = Object.entries(topicCount).sort((a,b) => b[1] - a[1]);
   const maxV = entries.length ? entries[0][1] : 1;
@@ -626,43 +624,72 @@ function renderStats($box, topicCount, deptCount, tasks, n){
 }
 
 /* --- 結果頁 --- */
-function buildResultText(){
-  const lines = [];
-  lines.push("【Claude 工作坊 課前調查回覆】");
-  lines.push("姓名：" + answers.name);
-  lines.push("部門：" + answers.dept);
-  lines.push("工作內容：" + (answers.job || "（未填）"));
-  lines.push("");
-  QUESTIONS.forEach(q=>{
-    const a = answers[q.id];
-    let text;
-    if(q.type === "multitext"){
-      text = q.fields.map(f => f.label + "：" + (a[f.key] || "（未填）")).join("／");
-    } else {
-      const fmt = o => o === OTHER ? "其他（" + (otherTexts[q.id] || "未說明") + "）" : o;
-      text = Array.isArray(a) ? (a.length ? a.map(fmt).join("、") : "（未填）") : (a ? fmt(a) : "（未填）");
-    }
-    lines.push(q.title);
-    lines.push("→ " + text);
-    lines.push("");
-  });
+function summaryAnswerText(q){
+  const a = answers[q.id];
+  if(q.type === "multitext"){
+    return q.fields.map(f => f.label + "：" + (a[f.key] || "（未填）")).join("；");
+  }
+  const fmt = o => o === OTHER ? "其他（" + (otherTexts[q.id] || "未說明") + "）" : o;
+  return Array.isArray(a) ? (a.length ? a.map(fmt).join("、") : "（未填）") : (a ? fmt(a) : "（未填）");
+}
+
+function buildResultSummaryHtml(){
+  const rows = QUESTIONS.map(q => `
+    <li class="summary-item">
+      <span class="summary-q">${esc(q.title)}</span><span class="summary-a">${esc(summaryAnswerText(q))}</span>
+    </li>`).join("");
   const tags = buildCategoryTags();
-  lines.push("【教材分類，供課程彙整用】");
-  lines.push("診斷建議：" + tags.diag);
-  lines.push("學員自選：" + tags.chosen);
-  return lines.join("\n");
+  return `
+    <div class="summary-title">Claude 工作坊 課前調查回覆</div>
+    <div class="summary-head">
+      <span><strong>姓名</strong>${esc(answers.name)}</span>
+      <span><strong>部門</strong>${esc(answers.dept)}</span>
+      <span><strong>工作內容</strong>${esc(answers.job || "（未填）")}</span>
+    </div>
+    <ul class="summary-list">${rows}</ul>
+    <div class="summary-tags">
+      <span><strong>診斷建議</strong>${esc(tags.diag)}</span>
+      <span><strong>學員自選</strong>${esc(tags.chosen)}</span>
+    </div>`;
+}
+
+function initSummaryToggle(){
+  const $summary = document.getElementById("summary");
+  const $clip = document.getElementById("summaryClip");
+  const $toggle = document.getElementById("summaryToggle");
+  if(!$summary || !$clip || !$toggle) return;
+  const fullHeight = $clip.scrollHeight;
+  const collapsedHeight = Math.max(280, Math.round(fullHeight * 0.5));
+  $summary.style.setProperty("--summary-collapsed-height", collapsedHeight + "px");
+  if(fullHeight <= collapsedHeight + 12){
+    $summary.classList.add("expanded");
+    $toggle.hidden = true;
+    return;
+  }
+  $toggle.addEventListener("click", ()=>{
+    const expanded = $summary.classList.toggle("expanded");
+    $toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+    $toggle.querySelector(".summary-toggle-text").textContent = expanded ? "向上收合" : "向下展開";
+    console.log("[survey] response summary toggled", {expanded});
+  });
 }
 
 function renderDone(){
-  const result = buildResultText();
+  const result = buildResultSummaryHtml();
   $screen.innerHTML = `
     <h1>填寫完成，最後一步</h1>
     <p class="hint">以下是你的填答摘要，匿名統計會顯示在下方。</p>
-    <div class="summary" id="summary">${esc(result)}</div>
+    <section class="summary" id="summary" aria-label="填答摘要">
+      <div class="summary-clip" id="summaryClip">${result}</div>
+      <button type="button" class="summary-toggle" id="summaryToggle" aria-expanded="false" aria-controls="summaryClip">
+        <span class="summary-toggle-text">向下展開</span>
+      </button>
+    </section>
     <div class="done-actions">
       <button class="btn btn-ghost" id="editBtn">回上一步</button>
     </div>
     <div class="stats" id="statsBox"></div>`;
+  initSummaryToggle();
 
   /* 網頁版:寫入共用統計後顯示大家的方向;離線 HTML 檔:說明統計僅線上網址可見 */
   const $statsBox = document.getElementById("statsBox");
