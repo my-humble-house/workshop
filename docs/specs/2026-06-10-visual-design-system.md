@@ -5,7 +5,7 @@
 
 ## 設計概念
 
-- 底圖改為從清水模參考圖取樣的深灰階 CSS 背景，不使用任何 SVG 繪圖。
+- 底圖改為從清水模參考圖取樣的深灰階 CSS 單色漸層毛玻璃背景，不使用任何 SVG 繪圖或分割圖。
 - 內容放在同樣取最深灰階的毛玻璃（frosted glass）卡片上，卡片用不對稱圓角打破方正感。
 - 全站只使用參考圖可取樣出的灰階色票，不引入其他彩度。
 - 內容文字、邊框、襯底、按鈕、統計長條都必須由下列清水模灰階色票衍生；可用同色 RGB 加透明度，但不可新增色相。
@@ -23,8 +23,9 @@
 | `--accent-press` | `#868686` | 主按鈕 hover/按下 |
 | `--on-accent` | `#0E0F0E` | 亮色襯底上的文字 |
 | `--bg` | `#1C1D1C` | 頁面底圖最深主色 |
-| `--glass` | `rgba(28,29,28,.78)` | 毛玻璃卡片底，取最深灰階 |
-| `--glass-solid` | `#1C1D1C` | 不支援 backdrop-filter 時的卡片退化底 |
+| `--page-glass` | `linear-gradient(145deg, rgba(54,55,54,.75), rgba(28,29,28,.75), rgba(14,15,14,.75))` | 頁面大底圖，單色漸層毛玻璃，75% 透明度 |
+| `--glass` | `linear-gradient(145deg, rgba(54,55,54,.75), rgba(28,29,28,.75), rgba(14,15,14,.75))` | 內容卡片底圖，單色漸層毛玻璃，75% 透明度 |
+| `--glass-solid` | `rgba(28,29,28,.75)` | 不支援 backdrop-filter 時的卡片退化底 |
 | `--row` | `rgba(54,55,54,.82)` | 選項、輸入欄、統計軌道的襯底 |
 | `--line` | `rgba(153,153,153,.44)` | 分隔線、卡片描邊、進度條軌道 |
 | `--shadow` | `rgba(14,15,14,.62)` | 卡片投影 |
@@ -61,17 +62,17 @@
 ## 版面與背景底圖
 
 - 頁面底色 `--bg`，body 置中單欄，內容最大寬 620px。
-- 背景底圖只能用 CSS `body::before` / `body::after` 產生：使用 `linear-gradient` 做清水模斜面、`repeating-linear-gradient` 做細微材質。
+- 背景底圖只能用 CSS `body::before` 產生：使用單一灰階 `linear-gradient` 做 75% 透明度的單色漸層毛玻璃背景，不使用分割斜面、色塊切線或材質網格。
 - 禁止 inline SVG、外部 SVG、data URI SVG、canvas 幾何繪圖作為背景或圖示。需要方向符號時用 CSS pseudo-element。
 - 背景層 `position:fixed`、`pointer-events:none`、z-index 0；內容卡片 z-index 1。
 - 背景可見色一律從色票取用，不得引入米白、紅色、藍色或其他彩度。
 
 ## 毛玻璃卡片
 
-- 底 `--glass` ＋ `backdrop-filter:blur(18px)`（含 `-webkit-` 前綴）。
+- 底 `--glass` ＋ `backdrop-filter:blur(18px)`（含 `-webkit-` 前綴），透明度維持 75%。
 - 描邊 `1px solid --line`，陰影 `0 22px 46px rgba(42,46,44,.22)`。
 - **不對稱圓角**：桌面 `30px 30px 76px 30px`（右下角放大）；行動 `24px 24px 52px 24px`。
-- 以 `@supports not (backdrop-filter…)` 退化為 `--glass-solid` 實色底。
+- 以 `@supports not (backdrop-filter…)` 退化為 `--glass-solid` 半透明底。
 
 ## 元件規範
 
