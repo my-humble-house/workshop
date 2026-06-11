@@ -60,17 +60,15 @@ const DEPTS = ["行銷處", "數位處", "其他"];
 
 /* 僅接受預期形狀與長度的欄位，其餘一律拒絕、歸零或過濾 */
 function validate(d) {
-  if (typeof d !== "object" || d === null) return null;
+  if (typeof d !== "object" || d === null || Array.isArray(d)) return null;
   const uid = String(d.uid || "");
   if (!/^[0-9a-z]{1,13}$/.test(uid)) return null;
   const dept = String(d.dept || "").trim();
   if (!DEPTS.includes(dept)) return null;
   const codes = (x) =>
     Array.isArray(x) ? x.filter((v) => typeof v === "string" && /^[A-I]$/.test(v)).slice(0, 9) : [];
-  const intIn = (v, max) => {
-    const n = Number(v);
-    return Number.isInteger(n) && n >= 0 && n <= max ? n : 0;
-  };
+  const intIn = (v, max) =>
+    typeof v === "number" && Number.isInteger(v) && v >= 0 && v <= max ? v : 0;
   const mat = Array.isArray(d.mat)
     ? d.mat.filter((v) => Number.isInteger(v) && v >= 1 && v <= 5).slice(0, 5)
     : [];
