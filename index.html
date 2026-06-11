@@ -299,7 +299,7 @@ const TOPIC_MAP = {
   "搞懂分享連結與檔案的安全差別，避免內部資料外流":"I"
 };
 
-/* Q16/Q17/Q18/Q13 選項文字 → 匿名統計代號（與 worker validate() 的範圍一致） */
+/* Q13/Q16/Q17/Q18 選項文字 → 匿名統計代號（與 worker validate() 的範圍一致） */
 const SUCC_CODES = {"產出可用的初稿":1,"建好之後可以重複用的模板":2,"明顯縮短整理時間":3,"數字不再出錯":4,"產出可以直接分享的檔案":5};
 const MAT_CODES  = {"去識別後的 Excel／CSV":1,"去識別後的文件（Word、PDF）":2,"圖片或截圖":3,"只有文字描述就夠":4,"還沒準備好":5};
 const LIMIT_CODES= {"我可以自己先把資料去識別再帶來":1,"真實資料完全不能用，請幫我準備虛構範例":2,"不確定怎麼判斷，想請講師協助改寫":3};
@@ -397,32 +397,41 @@ function renderGate(){
 }
 
 /* --- 基本資料頁 --- */
+const DEPTS = ["行銷處","數位處","其他"];
+
 function renderIntro(){
   $screen.innerHTML = `
     <h1>開始之前，先認識你一下</h1>
-    <p class="hint">共 ${TOTAL} 題，約 5 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
-    <div class="field-row">
-      <div class="field">
-        <label for="fName">姓名</label>
-        <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
-      </div>
-      <div class="field">
-        <label for="fDept">所屬部門</label>
-        <input type="text" id="fDept" value="${esc(answers.dept)}" placeholder="例：行銷部">
+    <p class="hint">共 ${TOTAL} 題，約 7 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
+    <div class="field">
+      <label for="fName">姓名</label>
+      <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>所屬部門</label>
+      <div class="options" id="deptOpts" style="margin-bottom:0">
+        ${DEPTS.map(d=>`<button type="button" class="opt ${answers.dept===d?"selected":""}" data-val="${esc(d)}">${d}</button>`).join("")}
       </div>
     </div>
     <div class="field">
       <label for="fJob">主要工作內容（一句話即可）</label>
       <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
     </div>
-    <p class="error" id="err">請填寫姓名與所屬部門。</p>
+    <p class="error" id="err">請填寫姓名並選擇所屬部門。</p>
     <div class="nav">
       <span></span>
       <button class="btn btn-primary" id="nextBtn">開始作答</button>
     </div>`;
+  document.querySelectorAll("#deptOpts .opt").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      answers.dept = b.dataset.val;
+      document.querySelectorAll("#deptOpts .opt").forEach(x=>x.classList.remove("selected"));
+      b.classList.add("selected");
+      document.getElementById("err").style.display = "none";
+    });
+  });
   document.getElementById("nextBtn").addEventListener("click", ()=>{
     answers.name = document.getElementById("fName").value.trim();
-    answers.dept = document.getElementById("fDept").value.trim();
     answers.job  = document.getElementById("fJob").value.trim();
     if(!answers.name || !answers.dept){
       document.getElementById("err").style.display = "block"; return;
