@@ -527,6 +527,17 @@ function renderQuestion(q){
         }
         $err.style.display = "none";
         b.classList.toggle("selected");
+        /* 互斥選項（如 Q4「都還沒用 Claude 做」）：選它清空其餘，選其餘取消它 */
+        if(q.exclusive && arr.includes(v)){
+          if(v === q.exclusive){
+            arr.length = 0; arr.push(q.exclusive);
+          } else {
+            const ex = arr.indexOf(q.exclusive);
+            if(ex >= 0) arr.splice(ex, 1);
+          }
+          document.querySelectorAll("#opts .opt").forEach(x =>
+            x.classList.toggle("selected", arr.includes(x.dataset.val)));
+        }
         if(v === OTHER && $otherWrap){
           $otherWrap.classList.toggle("show", arr.includes(OTHER));
           if(arr.includes(OTHER)) $otherInput.focus();
