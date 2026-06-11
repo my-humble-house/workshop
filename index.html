@@ -173,6 +173,25 @@
   .task-list{list-style:none;margin-top:8px}
   .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
   .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:2px;padding:2px 10px}
+  /* ===== 結果頁:自選/診斷雙列長條、部門欄、圖例 ===== */
+  .legend{font-size:16px;margin-bottom:12px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+  .duo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:16px}
+  .duo-row .bar-label{flex:0 0 11em}
+  .duo-tracks{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .duo-tracks .bar-track{height:10px}
+  .duo-nums{flex:0 0 4em;text-align:right;font-weight:600;font-size:16px}
+  .dept-cols{display:flex;gap:18px}
+  .dept-col{flex:1;min-width:0}
+  .dept-col h4{font-size:16px;font-weight:700;margin-bottom:6px}
+  .dept-col ol{padding-left:1.3em}
+  .dept-col li{font-size:16px;margin-bottom:6px}
+  .mini-num{display:block;font-size:16px}
+  .stats h3{margin-top:24px}
+  @media (max-width:560px){
+    .dept-cols{flex-direction:column;gap:10px}
+    .duo-row .bar-label{flex-basis:8em}
+  }
   @media (max-width:480px){.bar-label{flex-basis:8em}}
   @media (prefers-reduced-motion: reduce){.summary-toggle::after{transition:none}}
   @media (max-width:560px){
@@ -208,7 +227,8 @@
 /* ====== 教材類別定義(與內訓教材規劃一致) ====== */
 const CATEGORY_NAMES = {
   A:"帳號與初始設定", B:"三種模式選擇", C:"Token 與使用效率", D:"Project 建立與管理",
-  E:"報表與數字處理", F:"社群文案與自動化", G:"檔案產出與 Artifacts", H:"跨部門協作"
+  E:"報表與數字處理", F:"社群文案與自動化", G:"檔案產出與 Artifacts", H:"跨部門協作",
+  I:"分享與資訊安全"
 };
 
 /* ====== 題目資料 ====== */
@@ -220,11 +240,12 @@ const QUESTIONS = [
    title:"Q2. 你用過哪些模式？", hint:"可複選",
    options:["Chat 網頁版","手機 App","Cowork","Code","不確定自己用的是哪種"], other:true},
   {id:"q3", section:"第一部分・使用現況", type:"multi",
-   title:"Q3. 你最常請 Claude 做什麼？", hint:"可複選",
-   options:["寫或改文案","整理會議記錄","處理報表數字","翻譯","草擬郵件或提案","整理資料或文件","問問題、查資料"], other:true},
-  {id:"q4", section:"第一部分・使用現況", type:"multi",
-   title:"Q4. 你的工作固定要產出哪些東西？", hint:"可複選,不限是否用 Claude 做",
+   title:"Q3. 你的工作固定要產出哪些東西？", hint:"可複選，不限是否用 Claude 做",
    options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表"], other:true},
+  {id:"q4", section:"第一部分・使用現況", type:"multi",
+   title:"Q4. 上面這些產出，哪些已經在用 Claude 做？", hint:"可複選",
+   options:["會議記錄","SOP 或流程文件","報表或 Excel","簡報","社群文案","郵件或提案","互動式工具或圖表","都還沒用 Claude 做"],
+   exclusive:"都還沒用 Claude 做"},
   {id:"q5", section:"第二部分・使用習慣", type:"single",
    title:"Q5. 你通常怎麼開對話？",
    options:["一個對話從頭用到尾，什麼事都在裡面問","不同任務會開新對話","看心情，沒特別注意"], other:true},
@@ -243,8 +264,17 @@ const QUESTIONS = [
   {id:"q10", section:"第二部分・使用習慣", type:"multi",
    title:"Q10. 你是否遇過以下狀況？", hint:"可複選",
    options:["數字加總或計算結果出錯","用到一半被告知額度用完、要等冷卻","產出的格式每次都不一樣","讀取掃描檔或圖片時認錯字","都沒遇過"], other:true},
-  {id:"q11", section:"第三部分・需求與期待", type:"multi", max:3,
-   title:"Q11. 以下主題，選出你最想加強的", hint:"最多選三個",
+  {id:"q11", section:"第三部分・分享與資安", type:"multi",
+   title:"Q11. 你曾經把哪些內容貼給 Claude？", hint:"可複選，據實填寫即可，這題用來安排資安單元的深度，沒有對錯。",
+   options:["客人個資或訂位資料","內部成本或財務數字","未公開的活動或企劃內容","只有對外公開的資訊","不確定哪些可以貼","沒貼過任何內部內容"]},
+  {id:"q12", section:"第三部分・分享與資安", type:"single",
+   title:"Q12. Claude 產出的成果，你通常怎麼給同事或主管？",
+   options:["傳 Artifacts 分享連結","下載成檔案用 email 或群組傳","截圖貼群組","請對方直接看我的畫面操作","沒分享過"], other:true},
+  {id:"q13", section:"第三部分・分享與資安", type:"single",
+   title:"Q13. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
+   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
+  {id:"q14", section:"第四部分・需求與期待", type:"multi", max:3,
+   title:"Q14. 以下主題，選出你最想加強的", hint:"最多選三個",
    options:[
      "帳號與基本設定還不熟，想從頭學",
      "搞懂 Chat、Cowork、Code 什麼時候用哪個",
@@ -253,22 +283,29 @@ const QUESTIONS = [
      "報表與數字處理：給對檔案、數字不出錯",
      "社群文案半自動化：一次產出整週的量",
      "產出完整檔案：簡報、Word、Excel、互動圖表",
-     "跨部門協作時怎麼共用設定與成果"
+     "跨部門協作時怎麼共用設定與成果",
+     "搞懂分享連結與檔案的安全差別，避免內部資料外流"
    ]},
-  {id:"q12", section:"第三部分・需求與期待", type:"single",
-   title:"Q12. 你分得清楚「分享連結」和「離線 HTML 檔」的差別嗎？",
-   options:["分得清楚，兩種都用過","聽過但不確定差別在哪","第一次聽到這兩個詞"], other:true},
-  {id:"q13", section:"第三部分・需求與期待", type:"multitext",
-   title:"Q13. 課堂實作題：描述一個你想在課堂上完成的真實任務",
-   hint:"工作坊會直接用你的任務帶你做完,寫得越具體,課堂收穫越大。",
+  {id:"q15", section:"第五部分・課堂實作", type:"multitext",
+   title:"Q15. 課堂實作題：描述一個你想在課堂上完成的真實任務",
+   hint:"工作坊會直接用你的任務帶你做完，寫得越具體，課堂收穫越大。",
    fields:[
-     {key:"task", label:"這個任務是什麼", ph:"例:每週一要發四間館的 IG 文案,共 8 則", required:true},
-     {key:"now",  label:"現在怎麼做、多久做一次", ph:"例:每次自己想文案,大約花兩小時"},
-     {key:"goal", label:"希望 Claude 幫到什麼程度", ph:"例:我給主題就產出八成可用的初稿"}
-   ]}
+     {key:"task", label:"這個任務是什麼", ph:"例：每週一要發四間館的 IG 文案，共 8 則", required:true},
+     {key:"now",  label:"現在怎麼做、多久做一次", ph:"例：每次自己想文案，大約花兩小時"}
+   ]},
+  {id:"q16", section:"第五部分・課堂實作", type:"single",
+   title:"Q16. 這個案例完成到什麼程度算成功？",
+   options:["產出可用的初稿","建好之後可以重複用的模板","明顯縮短整理時間","數字不再出錯","產出可以直接分享的檔案"], other:true},
+  {id:"q17", section:"第五部分・課堂實作", type:"multi",
+   title:"Q17. 這個案例你現場能帶什麼素材？",
+   hint:"可複選。「去識別」＝把資料裡認得出特定客人或公司機密的內容拿掉或改掉：客人姓名改成「王◯◯」或「客人 A」、電話和 email 刪除、真實營收改成比例相同的假數字。判斷方法：這份檔案如果外流，會不會認出某位客人、或洩漏內部數字？會，就要先處理。",
+   options:["去識別後的 Excel／CSV","去識別後的文件（Word、PDF）","圖片或截圖","只有文字描述就夠","還沒準備好"]},
+  {id:"q18", section:"第五部分・課堂實作", type:"single",
+   title:"Q18. 這個案例的資料有沒有使用限制？",
+   options:["我可以自己先把資料去識別再帶來","真實資料完全不能用，請幫我準備虛構範例","不確定怎麼判斷，想請講師協助改寫"]}
 ];
 
-/* Q11 選項文字對應教材類別代號 */
+/* Q14 選項文字對應教材類別代號 */
 const TOPIC_MAP = {
   "帳號與基本設定還不熟，想從頭學":"A",
   "搞懂 Chat、Cowork、Code 什麼時候用哪個":"B",
@@ -277,8 +314,21 @@ const TOPIC_MAP = {
   "報表與數字處理：給對檔案、數字不出錯":"E",
   "社群文案半自動化：一次產出整週的量":"F",
   "產出完整檔案：簡報、Word、Excel、互動圖表":"G",
-  "跨部門協作時怎麼共用設定與成果":"H"
+  "跨部門協作時怎麼共用設定與成果":"H",
+  "搞懂分享連結與檔案的安全差別，避免內部資料外流":"I"
 };
+
+/* Q13/Q16/Q17/Q18 選項文字 → 匿名統計代號（與 worker validate() 的範圍一致） */
+const SUCC_CODES = {"產出可用的初稿":1,"建好之後可以重複用的模板":2,"明顯縮短整理時間":3,"數字不再出錯":4,"產出可以直接分享的檔案":5};
+const MAT_CODES  = {"去識別後的 Excel／CSV":1,"去識別後的文件（Word、PDF）":2,"圖片或截圖":3,"只有文字描述就夠":4,"還沒準備好":5};
+const LIMIT_CODES= {"我可以自己先把資料去識別再帶來":1,"真實資料完全不能用，請幫我準備虛構範例":2,"不確定怎麼判斷，想請講師協助改寫":3};
+const LIT_CODES  = {"分得清楚，兩種都用過":1,"聽過但不確定差別在哪":2,"第一次聽到這兩個詞":3};
+const SUCC_LABELS = ["（未填）","產出可用的初稿","可重複用的模板","縮短整理時間","數字不再出錯","可直接分享的檔案"];
+const MAT_LABELS  = ["","去識別 Excel／CSV","去識別文件","圖片或截圖","只有文字描述","還沒準備好"];
+const LIMIT_LABELS= ["","自備去識別資料","需要虛構範例","需要講師協助"];
+const LIT_LABELS  = ["","分得清楚","聽過但不確定","第一次聽到"];
+/* Q11 中視為「敏感暴露」的選項 */
+const SENS_OPTIONS = ["客人個資或訂位資料","內部成本或財務數字","不確定哪些可以貼"];
 
 /* ====== 狀態 ====== */
 let step = 0;                       // 0=基本資料, 1..N=題目, N+1=結果頁
@@ -366,32 +416,41 @@ function renderGate(){
 }
 
 /* --- 基本資料頁 --- */
+const DEPTS = ["行銷處","數位處","其他"];
+
 function renderIntro(){
   $screen.innerHTML = `
     <h1>開始之前，先認識你一下</h1>
-    <p class="hint">共 ${TOTAL} 題，約 5 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
-    <div class="field-row">
-      <div class="field">
-        <label for="fName">姓名</label>
-        <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
-      </div>
-      <div class="field">
-        <label for="fDept">所屬部門</label>
-        <input type="text" id="fDept" value="${esc(answers.dept)}" placeholder="例：行銷部">
+    <p class="hint">共 ${TOTAL} 題，約 7 分鐘。你的回答會用來安排課程內容和你的個人實作案例，沒有對錯，請依實際情況填寫。</p>
+    <div class="field">
+      <label for="fName">姓名</label>
+      <input type="text" id="fName" value="${esc(answers.name)}" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>所屬部門</label>
+      <div class="options" id="deptOpts" style="margin-bottom:0">
+        ${DEPTS.map(d=>`<button type="button" class="opt ${answers.dept===d?"selected":""}" data-val="${esc(d)}">${d}</button>`).join("")}
       </div>
     </div>
     <div class="field">
       <label for="fJob">主要工作內容（一句話即可）</label>
       <input type="text" id="fJob" value="${esc(answers.job)}" placeholder="例：負責兩間館的社群與活動文案">
     </div>
-    <p class="error" id="err">請填寫姓名與所屬部門。</p>
+    <p class="error" id="err">請填寫姓名並選擇所屬部門。</p>
     <div class="nav">
       <span></span>
       <button class="btn btn-primary" id="nextBtn">開始作答</button>
     </div>`;
+  document.querySelectorAll("#deptOpts .opt").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      answers.dept = b.dataset.val;
+      document.querySelectorAll("#deptOpts .opt").forEach(x=>x.classList.remove("selected"));
+      b.classList.add("selected");
+      document.getElementById("err").style.display = "none";
+    });
+  });
   document.getElementById("nextBtn").addEventListener("click", ()=>{
     answers.name = document.getElementById("fName").value.trim();
-    answers.dept = document.getElementById("fDept").value.trim();
     answers.job  = document.getElementById("fJob").value.trim();
     if(!answers.name || !answers.dept){
       document.getElementById("err").style.display = "block"; return;
@@ -487,6 +546,17 @@ function renderQuestion(q){
         }
         $err.style.display = "none";
         b.classList.toggle("selected");
+        /* 互斥選項（如 Q4「都還沒用 Claude 做」）：選它清空其餘，選其餘取消它 */
+        if(q.exclusive && arr.includes(v)){
+          if(v === q.exclusive){
+            arr.length = 0; arr.push(q.exclusive);
+          } else {
+            const ex = arr.indexOf(q.exclusive);
+            if(ex >= 0) arr.splice(ex, 1);
+          }
+          document.querySelectorAll("#opts .opt").forEach(x =>
+            x.classList.toggle("selected", arr.includes(x.dataset.val)));
+        }
         if(v === OTHER && $otherWrap){
           $otherWrap.classList.toggle("show", arr.includes(OTHER));
           if(arr.includes(OTHER)) $otherInput.focus();
@@ -522,7 +592,7 @@ function renderQuestion(q){
   });
 }
 
-/* --- 教材分類自動標籤 --- */
+/* --- 教材分類自動標籤（規則表見 docs/specs/2026-06-11-survey-question-revision-design.md） --- */
 function buildCategoryTags(){
   const diag = new Set();
   const a = answers;
@@ -531,16 +601,22 @@ function buildCategoryTags(){
   if(a.q5 === "一個對話從頭用到尾，什麼事都在裡面問") diag.add("C");
   if(a.q10.includes("用到一半被告知額度用完、要等冷卻")) diag.add("C");
   if(a.q6 === "每次對話開頭重新貼一次" || a.q6 === "不知道可以預先設定") diag.add("C").add("D");
-  if(a.q13.task) diag.add("D");                                  // 有固定實作任務,需要 Project
+  if(a.q15.task) diag.add("D");                                  // 有固定實作任務，需要 Project
+  if(a.q16 === "建好之後可以重複用的模板") diag.add("D");
   if(a.q7 === "整份檔案直接上傳") diag.add("E");
   if(a.q8.includes("掃描檔或紙本拍照") || a.q8.includes("手機截圖")) diag.add("E");
   if(a.q10.includes("數字加總或計算結果出錯") || a.q10.includes("讀取掃描檔或圖片時認錯字")) diag.add("E");
-  if(a.q3.includes("處理報表數字") || a.q4.includes("報表或 Excel")) diag.add("E");
-  if(a.q3.includes("寫或改文案") || a.q4.includes("社群文案")) diag.add("F");
-  if(a.q4.includes("簡報") || a.q4.includes("互動式工具或圖表")) diag.add("G");
-  if(a.q12 === "聽過但不確定差別在哪" || a.q12 === "第一次聽到這兩個詞") diag.add("H");
-  if(a.q12 === "第一次聽到這兩個詞") diag.add("G");
-  const chosen = a.q11.map(o => TOPIC_MAP[o]).filter(Boolean);
+  if(a.q3.includes("報表或 Excel")) diag.add("E");
+  if(a.q16 === "數字不再出錯") diag.add("E");
+  if(a.q3.includes("社群文案")) diag.add("F");
+  if(a.q16 === "產出可用的初稿") diag.add("F");
+  if(a.q3.includes("簡報") || a.q3.includes("互動式工具或圖表")) diag.add("G");
+  if(a.q13 === "第一次聽到這兩個詞") diag.add("G");
+  if(a.q16 === "產出可以直接分享的檔案") diag.add("G");
+  if(SENS_OPTIONS.some(o => a.q11.includes(o))) diag.add("I");
+  if(a.q12 === "傳 Artifacts 分享連結") diag.add("I");
+  if(a.q13 === "聽過但不確定差別在哪" || a.q13 === "第一次聽到這兩個詞") diag.add("I");
+  const chosen = a.q14.map(o => TOPIC_MAP[o]).filter(Boolean);
   const fmt = arr => arr.length ? arr.map(c => c + " " + CATEGORY_NAMES[c]).join("、") : "（無）";
   const diagArr = [...diag].sort();
   return { diag: fmt(diagArr), chosen: fmt(chosen), diagRaw: diagArr, chosenRaw: chosen };
@@ -556,7 +632,7 @@ function uidFrom(name, dept){
   return h.toString(36);
 }
 
-/* 組出匿名化回覆:只含部門、主題、診斷標籤、實作任務摘要,不含姓名與完整作答 */
+/* 組出匿名化回覆：只含部門、主題、診斷、任務摘要與備課代號，不含姓名與完整作答 */
 function buildPayload(){
   const tags = buildCategoryTags();
   return {
@@ -564,7 +640,12 @@ function buildPayload(){
     dept: answers.dept,
     topics: tags.chosenRaw,
     diag: tags.diagRaw,
-    task: (answers.q13.task || "").slice(0, 120),
+    task: (answers.q15.task || "").slice(0, 120),
+    succ: SUCC_CODES[answers.q16] || 0,
+    mat: answers.q17.map(o => MAT_CODES[o]).filter(Boolean),
+    limit: LIMIT_CODES[answers.q18] || 0,
+    sens: SENS_OPTIONS.some(o => answers.q11.includes(o)) ? 1 : 0,
+    lit: LIT_CODES[answers.q13] || 0,
     ts: Date.now()
   };
 }
@@ -602,42 +683,105 @@ async function loadShared($box, mine){
       $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你是第一位完成的，等其他同仁填寫後，這裡會出現大家最想學的主題統計。</p>';
       return;
     }
-    const topicCount = {}; const deptCount = {}; const tasks = [];
-    list.forEach(d => {
-      (d.topics || []).concat(d.diag || []).forEach(t => topicCount[t] = (topicCount[t]||0) + 1);
-      if(d.dept) deptCount[d.dept] = (deptCount[d.dept]||0) + 1;
-      if(d.task) tasks.push({dept: d.dept, task: d.task, ts: d.ts || 0});
-    });
     console.log("[survey] shared stats loaded", {count:list.length});
-    renderStats($box, topicCount, deptCount, tasks, list.length);
+    renderStats($box, aggregate(list));
   }catch(e){
     console.log("[survey] shared stats load failed", e);
     $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
   }
 }
 
-/* 繪製統計畫面:主題長條 + 各部門實作任務方向 */
-const BAR_SHADES = ["var(--bar-1)","var(--bar-2)","var(--bar-3)","var(--bar-4)"];   // 依名次取底圖灰階色票
-function renderStats($box, topicCount, deptCount, tasks, n){
-  const entries = Object.entries(topicCount).sort((a,b) => b[1] - a[1]);
-  const maxV = entries.length ? entries[0][1] : 1;
-  const bars = entries.map(([c, v], i) =>
-    `<div class="bar-row">
-      <span class="bar-label">${c} ${CATEGORY_NAMES[c] || ""}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${BAR_SHADES[Math.min(i, BAR_SHADES.length-1)]}"></span></span>
-      <span class="bar-num">${v}</span>
+/* 彙整全部匿名回覆;對缺欄位的舊 schema 回覆容錯 */
+function aggregate(list){
+  const g = {
+    n: list.length, deptCount: {}, topicSel: {}, topicDiag: {}, deptTopic: {},
+    litCount: [0,0,0,0], sensCount: 0,
+    matCount: [0,0,0,0,0,0], limitCount: [0,0,0,0], succCount: [0,0,0,0,0,0],
+    tasksByDept: {}
+  };
+  list.forEach(d => {
+    const dept = d.dept || "其他";
+    g.deptCount[dept] = (g.deptCount[dept]||0) + 1;
+    g.deptTopic[dept] = g.deptTopic[dept] || {};
+    const bump = (c, key) => {
+      g[key][c] = (g[key][c]||0) + 1;
+      const t = g.deptTopic[dept][c] = g.deptTopic[dept][c] || {sel:0, diag:0};
+      t[key === "topicSel" ? "sel" : "diag"]++;
+    };
+    (Array.isArray(d.topics) ? d.topics : []).forEach(c => bump(c, "topicSel"));
+    (Array.isArray(d.diag)   ? d.diag   : []).forEach(c => bump(c, "topicDiag"));
+    if(d.lit >= 1 && d.lit <= 3) g.litCount[d.lit]++;
+    if(d.sens === 1) g.sensCount++;
+    (Array.isArray(d.mat) ? d.mat : []).forEach(m => { if(m >= 1 && m <= 5) g.matCount[m]++; });
+    if(d.limit >= 1 && d.limit <= 3) g.limitCount[d.limit]++;
+    if(d.succ >= 1 && d.succ <= 5) g.succCount[d.succ]++;
+    if(d.task){ (g.tasksByDept[dept] = g.tasksByDept[dept]||[]).push({task:d.task, ts:d.ts||0}); }
+  });
+  return g;
+}
+
+/* 繪製統計畫面:完成人數→自選/診斷雙列→部門 Top3→資安準備度→備課資訊→任務分組 */
+function barRow(label, v, maxV, color){
+  return `<div class="bar-row">
+    <span class="bar-label">${esc(label)}</span>
+    <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${color}"></span></span>
+    <span class="bar-num">${v}</span>
+  </div>`;
+}
+
+function renderStats($box, g){
+  const deptLine = Object.entries(g.deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
+  /* 各主題需求度:自選與診斷分列,不加總 */
+  const codes = Object.keys(CATEGORY_NAMES)
+    .filter(c => (g.topicSel[c]||0) + (g.topicDiag[c]||0) > 0)
+    .sort((a,b) => ((g.topicSel[b]||0)+(g.topicDiag[b]||0)) - ((g.topicSel[a]||0)+(g.topicDiag[a]||0)));
+  const maxTopic = Math.max(1, ...codes.map(c => Math.max(g.topicSel[c]||0, g.topicDiag[c]||0)));
+  const duoRows = codes.map(c => `
+    <div class="duo-row">
+      <span class="bar-label">${c} ${CATEGORY_NAMES[c]}</span>
+      <span class="duo-tracks">
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicSel[c]||0)/maxTopic*100)}%;background:var(--bar-1)"></span></span>
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicDiag[c]||0)/maxTopic*100)}%;background:var(--bar-2)"></span></span>
+      </span>
+      <span class="duo-nums">${g.topicSel[c]||0}／${g.topicDiag[c]||0}</span>
     </div>`).join("");
-  const latest = tasks.sort((a,b) => b.ts - a.ts).slice(0, 8).map(t =>
-    `<li><span class="dept-tag">${esc(t.dept)}</span>${esc(t.task)}</li>`).join("");
-  const deptLine = Object.entries(deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
+  /* 各部門 Top3:自選+診斷合計排序,顯示時仍分列 */
+  const deptCols = Object.entries(g.deptTopic).map(([dept, m]) => {
+    const top = Object.entries(m).sort((a,b) => (b[1].sel+b[1].diag) - (a[1].sel+a[1].diag)).slice(0,3);
+    if(!top.length) return "";
+    return `<div class="dept-col"><h4>${esc(dept)}（${g.deptCount[dept]||0} 位）</h4>
+      <ol>${top.map(([c,v]) => `<li>${c} ${CATEGORY_NAMES[c]}<span class="mini-num">自選 ${v.sel}／診斷 ${v.diag}</span></li>`).join("")}</ol></div>`;
+  }).join("");
+  /* 資安準備度 */
+  const maxLit = Math.max(1, ...g.litCount);
+  const litRows = [1,2,3].map(i => barRow(LIT_LABELS[i], g.litCount[i], maxLit, "var(--bar-3)")).join("");
+  /* 講師備課資訊 */
+  const maxMat = Math.max(1, ...g.matCount);
+  const matRows = [1,2,3,4,5].map(i => barRow(MAT_LABELS[i], g.matCount[i], maxMat, "var(--bar-1)")).join("");
+  const maxLimit = Math.max(1, ...g.limitCount);
+  const limitRows = [1,2,3].map(i => barRow(LIMIT_LABELS[i], g.limitCount[i], maxLimit, "var(--bar-2)")).join("");
+  const maxSucc = Math.max(1, ...g.succCount);
+  const succRows = [1,2,3,4,5].map(i => barRow(SUCC_LABELS[i], g.succCount[i], maxSucc, "var(--bar-3)")).join("");
+  /* 實作任務依部門分組,每部門最新 5 筆 */
+  const taskGroups = Object.entries(g.tasksByDept).map(([dept, arr]) =>
+    `<ul class="task-list">${arr.sort((a,b) => b.ts - a.ts).slice(0,5)
+      .map(t => `<li><span class="dept-tag">${esc(dept)}</span>${esc(t.task)}</li>`).join("")}</ul>`).join("");
   $box.innerHTML = `
     <h2>大家提出的方向</h2>
-    <p class="hint">已有 ${n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名。</p>
-    <h3>最多人需要加強的主題</h3>
-    ${bars}
-    ${latest ? `<h3 style="margin-top:24px">其他同仁帶來的實作任務</h3>
-    <p class="hint">看看別人打算怎麼用，也許有你沒想過的用法。</p>
-    <ul class="task-list">${latest}</ul>` : ""}`;
+    <p class="hint">已有 ${g.n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名，僅列人數。</p>
+    <h3>各主題需求度</h3>
+    <p class="legend"><span class="dot" style="background:var(--bar-1)"></span>學員自選　<span class="dot" style="background:var(--bar-2)"></span>系統診斷</p>
+    ${duoRows}
+    ${deptCols ? `<h3>各部門最需要的主題</h3><div class="dept-cols">${deptCols}</div>` : ""}
+    <h3>資安準備度</h3>
+    <p class="hint">「分享連結 vs 離線檔案」認知分布；貼過敏感資料或不確定界線：${g.sensCount} 位。</p>
+    ${litRows}
+    <h3>講師備課資訊</h3>
+    <p class="hint">現場素材</p>${matRows}
+    <p class="hint" style="margin-top:12px">資料限制</p>${limitRows}
+    <p class="hint" style="margin-top:12px">成功標準</p>${succRows}
+    ${taskGroups ? `<h3>大家帶來的實作任務</h3>
+    <p class="hint">依部門分組，每部門最多顯示最新 5 筆，看看別人打算怎麼用。</p>${taskGroups}` : ""}`;
 }
 
 /* --- 結果頁 --- */
