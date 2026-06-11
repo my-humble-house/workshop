@@ -173,6 +173,25 @@
   .task-list{list-style:none;margin-top:8px}
   .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
   .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:2px;padding:2px 10px}
+  /* ===== 結果頁:自選/診斷雙列長條、部門欄、圖例 ===== */
+  .legend{font-size:16px;margin-bottom:12px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+  .duo-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:16px}
+  .duo-row .bar-label{flex:0 0 11em}
+  .duo-tracks{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .duo-tracks .bar-track{height:10px}
+  .duo-nums{flex:0 0 4em;text-align:right;font-weight:600;font-size:16px}
+  .dept-cols{display:flex;gap:18px}
+  .dept-col{flex:1;min-width:0}
+  .dept-col h4{font-size:16px;font-weight:700;margin-bottom:6px}
+  .dept-col ol{padding-left:1.3em}
+  .dept-col li{font-size:16px;margin-bottom:6px}
+  .mini-num{display:block;font-size:16px}
+  .stats h3{margin-top:24px}
+  @media (max-width:560px){
+    .dept-cols{flex-direction:column;gap:10px}
+    .duo-row .bar-label{flex-basis:8em}
+  }
   @media (max-width:480px){.bar-label{flex-basis:8em}}
   @media (prefers-reduced-motion: reduce){.summary-toggle::after{transition:none}}
   @media (max-width:560px){
@@ -664,42 +683,105 @@ async function loadShared($box, mine){
       $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">你是第一位完成的，等其他同仁填寫後，這裡會出現大家最想學的主題統計。</p>';
       return;
     }
-    const topicCount = {}; const deptCount = {}; const tasks = [];
-    list.forEach(d => {
-      (d.topics || []).concat(d.diag || []).forEach(t => topicCount[t] = (topicCount[t]||0) + 1);
-      if(d.dept) deptCount[d.dept] = (deptCount[d.dept]||0) + 1;
-      if(d.task) tasks.push({dept: d.dept, task: d.task, ts: d.ts || 0});
-    });
     console.log("[survey] shared stats loaded", {count:list.length});
-    renderStats($box, topicCount, deptCount, tasks, list.length);
+    renderStats($box, aggregate(list));
   }catch(e){
     console.log("[survey] shared stats load failed", e);
     $box.innerHTML = '<h2>大家提出的方向</h2><p class="hint">目前讀不到統計資料，請稍後重新整理這個頁面。你的填答摘要不受影響。</p>';
   }
 }
 
-/* 繪製統計畫面:主題長條 + 各部門實作任務方向 */
-const BAR_SHADES = ["var(--bar-1)","var(--bar-2)","var(--bar-3)","var(--bar-4)"];   // 依名次取底圖灰階色票
-function renderStats($box, topicCount, deptCount, tasks, n){
-  const entries = Object.entries(topicCount).sort((a,b) => b[1] - a[1]);
-  const maxV = entries.length ? entries[0][1] : 1;
-  const bars = entries.map(([c, v], i) =>
-    `<div class="bar-row">
-      <span class="bar-label">${c} ${CATEGORY_NAMES[c] || ""}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${BAR_SHADES[Math.min(i, BAR_SHADES.length-1)]}"></span></span>
-      <span class="bar-num">${v}</span>
+/* 彙整全部匿名回覆;對缺欄位的舊 schema 回覆容錯 */
+function aggregate(list){
+  const g = {
+    n: list.length, deptCount: {}, topicSel: {}, topicDiag: {}, deptTopic: {},
+    litCount: [0,0,0,0], sensCount: 0,
+    matCount: [0,0,0,0,0,0], limitCount: [0,0,0,0], succCount: [0,0,0,0,0,0],
+    tasksByDept: {}
+  };
+  list.forEach(d => {
+    const dept = d.dept || "其他";
+    g.deptCount[dept] = (g.deptCount[dept]||0) + 1;
+    g.deptTopic[dept] = g.deptTopic[dept] || {};
+    const bump = (c, key) => {
+      g[key][c] = (g[key][c]||0) + 1;
+      const t = g.deptTopic[dept][c] = g.deptTopic[dept][c] || {sel:0, diag:0};
+      t[key === "topicSel" ? "sel" : "diag"]++;
+    };
+    (Array.isArray(d.topics) ? d.topics : []).forEach(c => bump(c, "topicSel"));
+    (Array.isArray(d.diag)   ? d.diag   : []).forEach(c => bump(c, "topicDiag"));
+    if(d.lit >= 1 && d.lit <= 3) g.litCount[d.lit]++;
+    if(d.sens === 1) g.sensCount++;
+    (Array.isArray(d.mat) ? d.mat : []).forEach(m => { if(m >= 1 && m <= 5) g.matCount[m]++; });
+    if(d.limit >= 1 && d.limit <= 3) g.limitCount[d.limit]++;
+    if(d.succ >= 1 && d.succ <= 5) g.succCount[d.succ]++;
+    if(d.task){ (g.tasksByDept[dept] = g.tasksByDept[dept]||[]).push({task:d.task, ts:d.ts||0}); }
+  });
+  return g;
+}
+
+/* 繪製統計畫面:完成人數→自選/診斷雙列→部門 Top3→資安準備度→備課資訊→任務分組 */
+function barRow(label, v, maxV, color){
+  return `<div class="bar-row">
+    <span class="bar-label">${esc(label)}</span>
+    <span class="bar-track"><span class="bar-fill" style="width:${Math.round(v / maxV * 100)}%;background:${color}"></span></span>
+    <span class="bar-num">${v}</span>
+  </div>`;
+}
+
+function renderStats($box, g){
+  const deptLine = Object.entries(g.deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
+  /* 各主題需求度:自選與診斷分列,不加總 */
+  const codes = Object.keys(CATEGORY_NAMES)
+    .filter(c => (g.topicSel[c]||0) + (g.topicDiag[c]||0) > 0)
+    .sort((a,b) => ((g.topicSel[b]||0)+(g.topicDiag[b]||0)) - ((g.topicSel[a]||0)+(g.topicDiag[a]||0)));
+  const maxTopic = Math.max(1, ...codes.map(c => Math.max(g.topicSel[c]||0, g.topicDiag[c]||0)));
+  const duoRows = codes.map(c => `
+    <div class="duo-row">
+      <span class="bar-label">${c} ${CATEGORY_NAMES[c]}</span>
+      <span class="duo-tracks">
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicSel[c]||0)/maxTopic*100)}%;background:var(--bar-1)"></span></span>
+        <span class="bar-track"><span class="bar-fill" style="width:${Math.round((g.topicDiag[c]||0)/maxTopic*100)}%;background:var(--bar-2)"></span></span>
+      </span>
+      <span class="duo-nums">${g.topicSel[c]||0}／${g.topicDiag[c]||0}</span>
     </div>`).join("");
-  const latest = tasks.sort((a,b) => b.ts - a.ts).slice(0, 8).map(t =>
-    `<li><span class="dept-tag">${esc(t.dept)}</span>${esc(t.task)}</li>`).join("");
-  const deptLine = Object.entries(deptCount).map(([d, v]) => d + " " + v + " 位").join("、");
+  /* 各部門 Top3:自選+診斷合計排序,顯示時仍分列 */
+  const deptCols = Object.entries(g.deptTopic).map(([dept, m]) => {
+    const top = Object.entries(m).sort((a,b) => (b[1].sel+b[1].diag) - (a[1].sel+a[1].diag)).slice(0,3);
+    if(!top.length) return "";
+    return `<div class="dept-col"><h4>${esc(dept)}（${g.deptCount[dept]||0} 位）</h4>
+      <ol>${top.map(([c,v]) => `<li>${c} ${CATEGORY_NAMES[c]}<span class="mini-num">自選 ${v.sel}／診斷 ${v.diag}</span></li>`).join("")}</ol></div>`;
+  }).join("");
+  /* 資安準備度 */
+  const maxLit = Math.max(1, ...g.litCount);
+  const litRows = [1,2,3].map(i => barRow(LIT_LABELS[i], g.litCount[i], maxLit, "var(--bar-3)")).join("");
+  /* 講師備課資訊 */
+  const maxMat = Math.max(1, ...g.matCount);
+  const matRows = [1,2,3,4,5].map(i => barRow(MAT_LABELS[i], g.matCount[i], maxMat, "var(--bar-1)")).join("");
+  const maxLimit = Math.max(1, ...g.limitCount);
+  const limitRows = [1,2,3].map(i => barRow(LIMIT_LABELS[i], g.limitCount[i], maxLimit, "var(--bar-2)")).join("");
+  const maxSucc = Math.max(1, ...g.succCount);
+  const succRows = [1,2,3,4,5].map(i => barRow(SUCC_LABELS[i], g.succCount[i], maxSucc, "var(--bar-3)")).join("");
+  /* 實作任務依部門分組,每部門最新 5 筆 */
+  const taskGroups = Object.entries(g.tasksByDept).map(([dept, arr]) =>
+    `<ul class="task-list">${arr.sort((a,b) => b.ts - a.ts).slice(0,5)
+      .map(t => `<li><span class="dept-tag">${esc(dept)}</span>${esc(t.task)}</li>`).join("")}</ul>`).join("");
   $box.innerHTML = `
     <h2>大家提出的方向</h2>
-    <p class="hint">已有 ${n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名。</p>
-    <h3>最多人需要加強的主題</h3>
-    ${bars}
-    ${latest ? `<h3 style="margin-top:24px">其他同仁帶來的實作任務</h3>
-    <p class="hint">看看別人打算怎麼用，也許有你沒想過的用法。</p>
-    <ul class="task-list">${latest}</ul>` : ""}`;
+    <p class="hint">已有 ${g.n} 位同仁完成（${deptLine}）。統計為匿名彙整，不顯示姓名，僅列人數。</p>
+    <h3>各主題需求度</h3>
+    <p class="legend"><span class="dot" style="background:var(--bar-1)"></span>學員自選　<span class="dot" style="background:var(--bar-2)"></span>系統診斷</p>
+    ${duoRows}
+    ${deptCols ? `<h3>各部門最需要的主題</h3><div class="dept-cols">${deptCols}</div>` : ""}
+    <h3>資安準備度</h3>
+    <p class="hint">「分享連結 vs 離線檔案」認知分布；貼過敏感資料或不確定界線：${g.sensCount} 位。</p>
+    ${litRows}
+    <h3>講師備課資訊</h3>
+    <p class="hint">現場素材</p>${matRows}
+    <p class="hint" style="margin-top:12px">資料限制</p>${limitRows}
+    <p class="hint" style="margin-top:12px">成功標準</p>${succRows}
+    ${taskGroups ? `<h3>大家帶來的實作任務</h3>
+    <p class="hint">依部門分組，每部門最多顯示最新 5 筆，看看別人打算怎麼用。</p>${taskGroups}` : ""}`;
 }
 
 /* --- 結果頁 --- */
