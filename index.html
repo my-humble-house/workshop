@@ -6,31 +6,31 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Claude 工作坊 課前調查</title>
 <style>
-  /* ===== 清水模毛玻璃設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
+  /* ===== 寒舍集團內部表單設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
   :root{
-    --graphite-950:#090B0C;
-    --graphite-900:#0E1214;
-    --graphite-800:#151A1B;
-    --graphite-700:#20292A;
-    --graphite-600:#303634;
-    --concrete-warm-300:#8B8D84;
-    --concrete-warm-200:#B7AA92;
-    --concrete-warm-100:#C8BDA6;
-    --ink:#EDEAE2;                         /* 唯一內容文字色：暖灰白，避免冷底過硬 */
-    --accent:var(--concrete-warm-200);     /* 選中、主按鈕、進度、標籤襯底 */
-    --accent-press:var(--concrete-warm-100);
-    --on-accent:#15130F;                   /* 亮色襯底上的文字 */
-    --bg:var(--graphite-900);              /* 冷灰石墨主底色 */
-    --page-glass:linear-gradient(145deg,rgba(40,48,48,.75) 0%,rgba(21,25,26,.75) 54%,rgba(9,11,12,.75) 100%);
-    --glass:linear-gradient(145deg,rgba(43,44,39,.75) 0%,rgba(22,24,23,.75) 58%,rgba(9,11,12,.75) 100%);
-    --glass-solid:rgba(22,24,23,.75);
-    --row:rgba(48,54,52,.78);
-    --line:rgba(183,170,146,.40);
-    --shadow:rgba(3,6,7,.68);
-    --bar-1:var(--concrete-warm-100);
-    --bar-2:var(--concrete-warm-200);
-    --bar-3:var(--concrete-warm-300);
-    --bar-4:#687273;
+    --mhh-black:#050505;
+    --mhh-ink:#2C2A24;
+    --mhh-muted:#666666;
+    --mhh-blue:#3B5D6B;
+    --mhh-sage:#8FAF9B;
+    --mhh-bronze:#81603F;
+    --mhh-paper:#FFFFFF;
+    --mhh-porcelain:#F6F6F6;
+    --mhh-warm:#EFEAE1;
+    --ink:var(--mhh-ink);                  /* 唯一內容文字色：內部表單黑褐墨色 */
+    --accent:var(--mhh-blue);              /* 選中、主按鈕、進度、標籤襯底 */
+    --accent-press:#284450;
+    --on-accent:#FFFFFF;
+    --bg:var(--mhh-porcelain);
+    --paper:rgba(255,255,255,.94);
+    --row:rgba(255,255,255,.86);
+    --line:rgba(59,93,107,.24);
+    --line-strong:rgba(59,93,107,.52);
+    --shadow:rgba(44,42,36,.12);
+    --bar-1:var(--mhh-blue);
+    --bar-2:var(--mhh-sage);
+    --bar-3:var(--mhh-bronze);
+    --bar-4:#666666;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -40,53 +40,77 @@
     color:var(--ink);
     width:100%;
     display:flex;justify-content:center;align-items:flex-start;
-    padding:40px 16px;
+    padding:36px 16px;
     line-height:1.7;
     overflow-x:hidden;
   }
-  /* ===== CSS 單色漸層毛玻璃底圖：冷灰石墨＋溫灰清水模，不使用 SVG 或分割圖 ===== */
+  /* ===== CSS 內部表單底圖：官網式留白、細線與低彩度，不使用 SVG 或分割圖 ===== */
   body::before{
     content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background:var(--page-glass);
-    -webkit-backdrop-filter:blur(18px);
-    backdrop-filter:blur(18px);
+    background:
+      linear-gradient(145deg,rgba(255,255,255,.92) 0%,rgba(246,246,246,.94) 48%,rgba(239,234,225,.78) 100%);
   }
   .card{
     position:relative;z-index:1;
-    width:min(100%,620px);min-width:0;
-    background:var(--glass);
-    -webkit-backdrop-filter:blur(18px);
-    backdrop-filter:blur(18px);
+    width:min(100%,700px);min-width:0;
+    background:var(--paper);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
     border:1px solid var(--line);
-    border-radius:30px 30px 76px 30px;
-    box-shadow:0 24px 54px var(--shadow),inset 0 1px 0 rgba(237,234,226,.05);
-    padding:36px 34px 30px;
+    border-top:4px solid var(--mhh-black);
+    border-radius:4px;
+    box-shadow:0 20px 54px var(--shadow);
+    padding:30px 34px 28px;
   }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-    .card{background:var(--glass-solid)}
+    .card{background:var(--mhh-paper)}
+  }
+  /* ===== 品牌標頭：參考集團黑白章紋與官網導覽語氣，使用文字式識別 ===== */
+  .brand-masthead{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);
+  }
+  .brand-lockup{display:flex;align-items:center;gap:16px;min-width:0}
+  .brand-seal{
+    width:62px;height:62px;flex:none;display:grid;place-items:center;position:relative;
+    background:var(--mhh-black);color:var(--mhh-paper);border:1px solid var(--mhh-black);
+    font-size:18px;font-weight:700;letter-spacing:.08em;line-height:1;
+  }
+  .brand-seal::before,.brand-seal::after{
+    content:"";position:absolute;left:11px;right:11px;border-top:1px solid rgba(255,255,255,.72);
+  }
+  .brand-seal::before{top:15px}
+  .brand-seal::after{bottom:15px}
+  .brand-copy{min-width:0}
+  .brand-kicker{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--mhh-blue);line-height:1.4}
+  .brand-title{font-size:20px;font-weight:700;letter-spacing:.18em;line-height:1.45;margin-top:2px}
+  .brand-subtitle{font-size:13px;color:var(--mhh-muted);letter-spacing:.08em;line-height:1.5;margin-top:2px}
+  .brand-meta{
+    flex:none;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--mhh-muted);
+    border-left:1px solid var(--line);padding-left:18px;text-align:right;line-height:1.5;
   }
   /* ===== 進度條 ===== */
   .progress-wrap{margin-bottom:20px}
-  .progress-label{font-size:16px;font-weight:600;letter-spacing:.2em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+  .progress-label{font-size:16px;font-weight:600;letter-spacing:.18em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
   .progress-label span{font-size:16px}
   .p-num,.p-total{font-size:16px;font-weight:600;letter-spacing:0;line-height:1}
-  .progress-bar{height:4px;background:rgba(183,170,146,.28);border-radius:99px;overflow:hidden}
-  .progress-fill{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .3s ease}
+  .progress-bar{height:3px;background:rgba(59,93,107,.16);border-radius:0;overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent);border-radius:0;width:0%;transition:width .3s ease}
   @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
   /* ===== 題目區 ===== */
-  h1{font-size:24px;font-weight:700;line-height:1.45;margin-bottom:6px}
-  h2{font-size:20px;font-weight:700;line-height:1.5;margin-bottom:6px}
-  h3{font-size:12px;font-weight:700;letter-spacing:.22em;margin-bottom:12px}
+  h1{font-size:24px;font-weight:700;line-height:1.45;margin-bottom:6px;letter-spacing:.04em}
+  h2{font-size:20px;font-weight:700;line-height:1.5;margin-bottom:6px;letter-spacing:.03em}
+  h3{font-size:12px;font-weight:700;letter-spacing:.22em;margin-bottom:12px;color:var(--mhh-blue)}
   .hint{font-size:14px;margin-bottom:16px}
   /* ===== 選項按鈕（選單類，保持規則矩形） ===== */
   .options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
   .opt{
     width:100%;text-align:left;
     font-size:16px;font-family:inherit;color:var(--ink);
-    background:var(--row);border:1.5px solid var(--line);border-radius:11px;
-    padding:13px 18px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(237,234,226,.035);
+    background:var(--row);border:1px solid var(--line);border-left:3px solid var(--line);
+    border-radius:2px;padding:13px 18px;cursor:pointer;
   }
-  .opt:hover{border-color:var(--accent)}
+  .opt:hover{border-color:var(--line-strong);border-left-color:var(--mhh-sage)}
   .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
   /* ===== 輸入欄位 ===== */
@@ -97,7 +121,7 @@
   .field label{display:block;font-size:16px;font-weight:600;margin-bottom:6px}
   input[type=text],textarea{
     width:100%;font-size:16px;font-family:inherit;color:var(--ink);
-    border:1.5px solid var(--line);border-radius:11px;padding:12px 16px;background:var(--row);
+    border:1px solid var(--line);border-radius:2px;padding:12px 16px;background:var(--row);
   }
   input[type=text]::placeholder,textarea::placeholder{color:var(--ink);opacity:.45}
   input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)}
@@ -106,15 +130,15 @@
   .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .btn{
     font-size:16px;font-family:inherit;font-weight:600;
-    border-radius:99px;padding:12px 28px;cursor:pointer;border:1.5px solid transparent;
+    border-radius:2px;padding:12px 28px;cursor:pointer;border:1px solid transparent;
   }
   .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .btn-primary{background:var(--accent);color:var(--on-accent)}
+  .btn-primary{background:var(--mhh-black);color:var(--on-accent)}
   .btn-primary:hover{background:var(--accent-press)}
   .btn-ghost{background:none;color:var(--ink);padding:12px 10px}
   .btn-ghost:hover{text-decoration:underline}
   /* 錯誤提示：同色票襯底膠囊，不用紅色 */
-  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;border-radius:99px;padding:6px 16px;margin:-10px 0 16px}
+  .error{display:none;width:fit-content;background:var(--accent);color:var(--on-accent);font-size:13px;font-weight:600;border-radius:2px;padding:6px 16px;margin:-10px 0 16px}
   /* ===== 結果頁 ===== */
   .summary{
     position:relative;font-size:16px;line-height:1.55;margin-bottom:18px;
@@ -145,7 +169,7 @@
     content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;
     transform:rotate(45deg);transition:transform .2s ease;margin-top:-4px;
   }
-  .summary-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:99px}
+  .summary-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
   .summary.expanded .summary-toggle::after{transform:rotate(225deg);margin-top:4px}
   .done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .other-wrap{display:none;margin-top:-2px}
@@ -156,19 +180,38 @@
   .stats .hint{font-size:16px;margin-bottom:16px}
   .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:16px}
   .bar-label{flex:0 0 11em}
-  .bar-track{flex:1;height:18px;background:var(--row);border-radius:99px;overflow:hidden}
-  .bar-fill{display:block;height:100%;background:var(--accent);border-radius:99px}
+  .bar-track{flex:1;height:18px;background:var(--row);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .bar-fill{display:block;height:100%;background:var(--accent);border-radius:0}
   .bar-num{flex:0 0 2em;text-align:right;font-weight:600}
   .task-list{list-style:none;margin-top:8px}
   .task-list li{font-size:16px;padding:8px 0;display:flex;gap:10px;align-items:baseline}
-  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:99px;padding:2px 10px}
+  .task-list .dept-tag{flex:none;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:11px;border-radius:2px;padding:2px 10px}
   @media (max-width:480px){.bar-label{flex-basis:8em}}
   @media (prefers-reduced-motion: reduce){.summary-toggle::after{transition:none}}
-  @media (max-width:480px){.card{padding:28px 22px 24px;border-radius:24px 24px 52px 24px}h1{font-size:21px}h2{font-size:18px}}
+  @media (max-width:560px){
+    body{padding:18px 12px}
+    .card{padding:22px 18px 22px;border-radius:2px}
+    .brand-masthead{align-items:flex-start;gap:14px}
+    .brand-seal{width:54px;height:54px;font-size:16px}
+    .brand-title{font-size:18px}
+    .brand-meta{display:none}
+    h1{font-size:21px}h2{font-size:18px}
+  }
 </style>
 </head>
 <body>
 <div class="card">
+  <div class="brand-masthead" aria-label="寒舍集團內部調查">
+    <div class="brand-lockup">
+      <div class="brand-seal" aria-hidden="true">MHH</div>
+      <div class="brand-copy">
+        <div class="brand-kicker">MY HUMBLE HOUSE</div>
+        <div class="brand-title">寒舍集團</div>
+        <div class="brand-subtitle">內部工作坊課前調查</div>
+      </div>
+    </div>
+    <div class="brand-meta">INTERNAL<br>SURVEY</div>
+  </div>
   <div class="progress-wrap" id="progressWrap">
     <div class="progress-label"><span id="progressSection"></span><span id="progressCount"></span></div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
