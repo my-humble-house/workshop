@@ -4,7 +4,7 @@
  * GET  /api/responses 回傳全部匿名回覆陣列
  * GET  /api/verify    驗證通行碼（前端進站鎖定頁使用）
  *
- * KV 只存匿名欄位（dept/topics/diag/task/ts），不存姓名與完整作答。
+ * KV 只存匿名欄位（dept/topics/diag/task/succ/mat/limit/sens/lit/ts），不存姓名與完整作答。
  *
  * 防護層：
  * - 通行碼：兩個端點都要求 X-Class-Code 標頭等於 CLASS_CODE secret，
@@ -55,21 +55,36 @@ async function rateLimited(env, ip) {
   return false;
 }
 
-/* 僅接受預期形狀與長度的欄位，其餘一律拒絕或截斷 */
+/* 部門白名單：與前端基本資料的固定選項一致 */
+const DEPTS = ["行銷處", "數位處", "其他"];
+
+/* 僅接受預期形狀與長度的欄位，其餘一律拒絕、歸零或過濾 */
 function validate(d) {
   if (typeof d !== "object" || d === null) return null;
   const uid = String(d.uid || "");
   if (!/^[0-9a-z]{1,13}$/.test(uid)) return null;
-  const dept = String(d.dept || "").trim().slice(0, 50);
-  if (!dept) return null;
+  const dept = String(d.dept || "").trim();
+  if (!DEPTS.includes(dept)) return null;
   const codes = (x) =>
-    Array.isArray(x) ? x.filter((v) => typeof v === "string" && /^[A-H]$/.test(v)).slice(0, 8) : [];
+    Array.isArray(x) ? x.filter((v) => typeof v === "string" && /^[A-I]$/.test(v)).slice(0, 9) : [];
+  const intIn = (v, max) => {
+    const n = Number(v);
+    return Number.isInteger(n) && n >= 0 && n <= max ? n : 0;
+  };
+  const mat = Array.isArray(d.mat)
+    ? d.mat.filter((v) => Number.isInteger(v) && v >= 1 && v <= 5).slice(0, 5)
+    : [];
   return {
     uid,
     dept,
     topics: codes(d.topics),
     diag: codes(d.diag),
     task: String(d.task || "").slice(0, 120),
+    succ: intIn(d.succ, 5),    // Q16 成功標準 1–5，0=未填/其他
+    mat,                        // Q17 素材代號 1–5
+    limit: intIn(d.limit, 3),  // Q18 資料限制 1–3
+    sens: intIn(d.sens, 1),    // Q11 是否貼過敏感內容或不確定界線
+    lit: intIn(d.lit, 3),      // Q13 分享連結認知 1–3
     ts: Number(d.ts) || Date.now(),
   };
 }
