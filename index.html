@@ -8,33 +8,29 @@
 <style>
   /* ===== 清水模毛玻璃設計系統：規範見 docs/specs/2026-06-10-visual-design-system.md ===== */
   :root{
-    --concrete-950:#0E0F0E;
-    --concrete-900:#1C1D1C;
-    --concrete-800:#363736;
-    --concrete-700:#4A4A4A;
-    --concrete-650:#575757;
-    --concrete-600:#616261;
-    --concrete-500:#6B6C6C;
-    --concrete-400:#777878;
-    --concrete-300:#868686;
-    --concrete-200:#999999;
-    --concrete-100:#A1A2A1;
-    --concrete-050:#AFAFAF;
-    --ink:var(--concrete-050);             /* 唯一內容文字色：由底圖最亮灰取樣 */
-    --accent:var(--concrete-200);          /* 選中、主按鈕、進度、標籤襯底 */
-    --accent-press:var(--concrete-300);
-    --on-accent:var(--concrete-950);       /* 亮色襯底上的文字 */
-    --bg:var(--concrete-900);              /* 底圖最深主色 */
-    --page-glass:linear-gradient(145deg,rgba(54,55,54,.75) 0%,rgba(28,29,28,.75) 54%,rgba(14,15,14,.75) 100%);
-    --glass:linear-gradient(145deg,rgba(54,55,54,.75) 0%,rgba(28,29,28,.75) 58%,rgba(14,15,14,.75) 100%);
-    --glass-solid:rgba(28,29,28,.75);
-    --row:rgba(54,55,54,.82);
-    --line:rgba(153,153,153,.44);
-    --shadow:rgba(14,15,14,.62);
-    --bar-1:var(--concrete-100);
-    --bar-2:var(--concrete-200);
-    --bar-3:var(--concrete-300);
-    --bar-4:var(--concrete-400);
+    --graphite-950:#090B0C;
+    --graphite-900:#0E1214;
+    --graphite-800:#151A1B;
+    --graphite-700:#20292A;
+    --graphite-600:#303634;
+    --concrete-warm-300:#8B8D84;
+    --concrete-warm-200:#B7AA92;
+    --concrete-warm-100:#C8BDA6;
+    --ink:#EDEAE2;                         /* 唯一內容文字色：暖灰白，避免冷底過硬 */
+    --accent:var(--concrete-warm-200);     /* 選中、主按鈕、進度、標籤襯底 */
+    --accent-press:var(--concrete-warm-100);
+    --on-accent:#15130F;                   /* 亮色襯底上的文字 */
+    --bg:var(--graphite-900);              /* 冷灰石墨主底色 */
+    --page-glass:linear-gradient(145deg,rgba(40,48,48,.75) 0%,rgba(21,25,26,.75) 54%,rgba(9,11,12,.75) 100%);
+    --glass:linear-gradient(145deg,rgba(43,44,39,.75) 0%,rgba(22,24,23,.75) 58%,rgba(9,11,12,.75) 100%);
+    --glass-solid:rgba(22,24,23,.75);
+    --row:rgba(48,54,52,.78);
+    --line:rgba(183,170,146,.40);
+    --shadow:rgba(3,6,7,.68);
+    --bar-1:var(--concrete-warm-100);
+    --bar-2:var(--concrete-warm-200);
+    --bar-3:var(--concrete-warm-300);
+    --bar-4:#687273;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -48,7 +44,7 @@
     line-height:1.7;
     overflow-x:hidden;
   }
-  /* ===== CSS 單色漸層毛玻璃底圖：取樣灰階色票，不使用 SVG 或分割圖 ===== */
+  /* ===== CSS 單色漸層毛玻璃底圖：冷灰石墨＋溫灰清水模，不使用 SVG 或分割圖 ===== */
   body::before{
     content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     background:var(--page-glass);
@@ -63,7 +59,7 @@
     backdrop-filter:blur(18px);
     border:1px solid var(--line);
     border-radius:30px 30px 76px 30px;
-    box-shadow:0 22px 46px var(--shadow);
+    box-shadow:0 24px 54px var(--shadow),inset 0 1px 0 rgba(237,234,226,.05);
     padding:36px 34px 30px;
   }
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -74,7 +70,7 @@
   .progress-label{font-size:16px;font-weight:600;letter-spacing:.2em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
   .progress-label span{font-size:16px}
   .p-num,.p-total{font-size:16px;font-weight:600;letter-spacing:0;line-height:1}
-  .progress-bar{height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress-bar{height:4px;background:rgba(183,170,146,.28);border-radius:99px;overflow:hidden}
   .progress-fill{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .3s ease}
   @media (prefers-reduced-motion: reduce){.progress-fill{transition:none}}
   /* ===== 題目區 ===== */
@@ -88,7 +84,7 @@
     width:100%;text-align:left;
     font-size:16px;font-family:inherit;color:var(--ink);
     background:var(--row);border:1.5px solid var(--line);border-radius:11px;
-    padding:13px 18px;cursor:pointer;
+    padding:13px 18px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(237,234,226,.035);
   }
   .opt:hover{border-color:var(--accent)}
   .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
